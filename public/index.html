@@ -2,28 +2,86 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Maná Restobar - Pamplona</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Estilos para el PDF - SOLUCIÓN SIMPLE */
+        .pdf-container {
+            width: 100%;
+            max-width: 900px;
+            margin: 30px auto;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            background: white;
+            min-height: 600px;
+        }
+        
+        .pdf-viewer {
+            width: 100%;
+            height: 700px;
+            border: none;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .pdf-viewer {
+                height: 500px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .pdf-viewer {
+                height: 400px;
+            }
+        }
+        
+        /* Estilos adicionales */
+        body {
+            background-color: #f8f8f8;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            font-family: 'Open Sans', sans-serif;
+        }
+        
+        .section {
+            display: none;
+            padding: 40px 0;
+            background: white;
+            min-height: 80vh;
+        }
+        
+        .section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
 </head>
 <body>
     <!-- Header con fondo borroso -->
     <header class="header" id="mainHeader">
         <div class="container">
             <div class="logo">
-                <img src="images/Logo.png.jpeg" alt="Maná Restobar">
+                <img src="images/Logo.png.jpeg" alt="Maná Restobar" style="max-height: 60px;">
             </div>
-            <!-- Aproximadamente línea 47-55 -->
-<nav class="nav">
-    <ul>
-        <li><a href="#inicio" class="nav-link active" data-section="inicio">Inicio</a></li>
-        <li><a href="#menu" class="nav-link" data-section="menu">Menú</a></li>
-        <li><a href="#arma-almuerzo" class="nav-link" data-section="arma-almuerzo">Arma tu Almuerzo</a></li>
-        <li><a href="#reservas" class="nav-link" data-section="reservas">Reservas</a></li>
-    </ul>
-</nav>
+            <nav class="nav">
+                <ul>
+                    <li><a href="#inicio" class="nav-link active" data-section="inicio">Inicio</a></li>
+                    <li><a href="#menu" class="nav-link" data-section="menu">Menú</a></li>
+                    <li><a href="#arma-almuerzo" class="nav-link" data-section="arma-almuerzo">Arma tu Almuerzo</a></li>
+                    <li><a href="#reservas" class="nav-link" data-section="reservas">Reservas</a></li>
+                </ul>
+            </nav>
             <div class="social-icons">
                 <a href="https://www.facebook.com/profile.php?id=61572704497545" target="_blank" class="social-icon">
                     <i class="fab fa-facebook-f"></i>
@@ -61,60 +119,66 @@
                 </div>
 
                 <div class="galeria-section">
-    <h2>Un Vistazo a Nuestro Sabor</h2>
-    <p class="subtitle">Explora la variedad y calidad que nos caracteriza en cada plato que servimos.</p>
-    
-    <div class="collage-grid">
-        <!-- Collage de imágenes de nuestras comidas -->
-        <div class="collage-item">
-            <img src="images/comida1.jpg" alt="Plato especial del restaurante" loading="lazy">
-        </div>
-        <div class="collage-item">
-            <img src="images/comida2.jpg" alt="Plato gourmet" loading="lazy">
-        </div>
-        <div class="collage-item">
-            <img src="images/comida3.jpeg" alt="Especialidad de la casa" loading="lazy">
-        </div>
-        <div class="collage-item">
-            <img src="images/comida4.jpeg" alt="Menú ejecutivo" loading="lazy">
-        </div>
-        <div class="collage-item">
-            <img src="images/comida5.jpeg" alt="Plato tradicional" loading="lazy">
-        </div>
-        <div class="collage-item">
-            <img src="images/comida6.jpeg" alt="Especialidad culinaria" loading="lazy">
-        </div>
-    </div>
-</div>
+                    <h2>Un Vistazo a Nuestro Sabor</h2>
+                    <p class="subtitle">Explora la variedad y calidad que nos caracteriza en cada plato que servimos.</p>
+                    
+                    <div class="collage-grid">
+                        <!-- Collage de imágenes de nuestras comidas -->
+                        <div class="collage-item">
+                            <img src="images/comida1.jpg" alt="Plato especial del restaurante" loading="lazy" onerror="this.style.display='none'">
+                        </div>
+                        <div class="collage-item">
+                            <img src="images/comida2.jpg" alt="Plato gourmet" loading="lazy" onerror="this.style.display='none'">
+                        </div>
+                        <div class="collage-item">
+                            <img src="images/comida3.jpeg" alt="Especialidad de la casa" loading="lazy" onerror="this.style.display='none'">
+                        </div>
+                        <div class="collage-item">
+                            <img src="images/comida4.jpeg" alt="Menú ejecutivo" loading="lazy" onerror="this.style.display='none'">
+                        </div>
+                        <div class="collage-item">
+                            <img src="images/comida5.jpeg" alt="Plato tradicional" loading="lazy" onerror="this.style.display='none'">
+                        </div>
+                        <div class="collage-item">
+                            <img src="images/comida6.jpeg" alt="Especialidad culinaria" loading="lazy" onerror="this.style.display='none'">
+                        </div>
+                    </div>
+                </div>
+            </div>
         </section>
 
-        <!-- Sección MENÚ -->
+        <!-- Sección MENÚ - VERSIÓN CORREGIDA Y FUNCIONAL -->
         <section id="menu-section" class="section">
             <div class="container">
                 <h2 class="section-title">Nuestro Menú</h2>
                 
-                <div class="menu-embed-container">
-                    <embed src="images/carta-completa.pdf.pdf" type="application/pdf" width="100%" height="500px">
+                <!-- Contenedor del PDF - SOLUCIÓN SIMPLE -->
+                <div class="pdf-container">
+                    <iframe 
+                        src="images/carta-completa.pdf.pdf" 
+                        class="pdf-viewer"
+                        title="Menú Maná Restobar"
+                    >
+                        <p style="text-align: center; padding: 40px;">
+                            Tu navegador no puede mostrar el PDF. 
+                            <a href="images/carta-completa.pdf.pdf" download style="color: #d4af37; font-weight: bold;">
+                                Descarga el menú aquí
+                            </a>
+                        </p>
+                    </iframe>
                 </div>
                 
-                   <div style="
-    width: 100%;
-    max-width: 900px;
-    margin: 40px auto;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-">
-    <embed 
-        src="/uploads/carta-completa.pdf" 
-        type="application/pdf" 
-        width="100%" 
-        height="800px"
-    />
-</div>
-
-
-
+                <!-- Mensaje alternativo por si el PDF no carga -->
+                <div id="pdf-message" style="text-align: center; margin-top: 20px; display: none;">
+                    <p style="color: #666; margin-bottom: 10px;">
+                        <i class="fas fa-info-circle"></i> Si no ves el menú, intenta:
+                    </p>
+                    <a href="images/carta-completa.pdf.pdf" target="_blank" 
+                       style="background: #d4af37; color: white; padding: 10px 20px; 
+                              border-radius: 5px; text-decoration: none; display: inline-block;">
+                        <i class="fas fa-external-link-alt"></i> Abrir en nueva pestaña
+                    </a>
+                </div>
 
                 <div class="menu-types">
                     <div class="menu-type-card">
@@ -147,12 +211,6 @@
                                     <p class="option-price">$4.000</p>
                                 </div>
                             </div>
-                            <div class="options-grid-simple" id="dynamic-options">
-                             <!-- Las opciones se cargarán aquí dinámicamente -->
-                                <div class="loading-options">
-                               <p>Cargando opciones del menú...</p>
-                                </div>
-                           </div>
                             
                             <div class="option-card" data-name="Papas a la Francesa" data-price="5200">
                                 <div class="option-icon">🍟</div>
@@ -391,8 +449,8 @@
                                 <p>A nombre de María Mendoza</p>
                             </div>
                             <div class="pago-method">
-                                <h4>Breve</h4>
-                                <p><strong>@3105539582</strong></p>
+                                <h4>Nequi</h4>
+                                <p><strong>3105539582</strong></p>
                                 <p>A nombre de María Mendoza</p>
                             </div>
                         </div>
@@ -424,7 +482,7 @@
                     <div class="horarios-box">
                         <h3>Horarios de atención</h3>
                         <p><strong>Desayunos:</strong> 7:30 AM - 9:00 AM</p>
-                        <p><strong>Almuerzos:</strong> 12:00 AM - 3:00 PM</p>
+                        <p><strong>Almuerzos:</strong> 12:00 PM - 3:00 PM</p>
                         <p><strong>Comidas Rápidas:</strong> 5:00 PM - 9:00 PM</p>
                         <p><strong>Cafetería:</strong> 7:30 AM - 9:00 PM</p>
                         <p class="footer-lema">Un restaurante familiar con un ambiente acogedor para todos.</p>
@@ -456,61 +514,263 @@
         </div>
     </footer>
 
-    <script src="js/main.js"></script>
-    <!-- AGREGAR ESTO DESPUÉS de <script src="js/main.js"></script> -->
-<script>
-// Cargar datos dinámicos de la página principal
-document.addEventListener('DOMContentLoaded', function() {
-    // 1. Cargar historia dinámica
-    fetch('/api/data')
-        .then(response => response.json())
-        .then(data => {
-            // Actualizar la sección de historia
-            const historiaContainer = document.querySelector('.historia-content');
-            if (historiaContainer && data.historia) {
-                historiaContainer.innerHTML = `<p>${data.historia}</p>`;
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // ===== Navegación entre secciones =====
+        const navLinks = document.querySelectorAll('.nav-link');
+        const sections = document.querySelectorAll('.section');
+        
+        function showSection(sectionId) {
+            // Ocultar todas las secciones
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remover clase activa de todos los enlaces
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            // Mostrar sección seleccionada
+            const targetSection = document.getElementById(sectionId + '-section');
+            if (targetSection) {
+                targetSection.classList.add('active');
             }
             
-            // 2. Actualizar políticas de reservas (si existen en el DOM)
-            const politicaItems = document.querySelectorAll('.politica-item p');
-            if (data.reservas && politicaItems.length >= 3) {
-                // Actualizar políticas si están en el HTML
-                if (data.reservas.politicaCancelacion) {
-                    document.querySelector('.politica-item:nth-child(1) p').textContent = data.reservas.politicaCancelacion;
-                }
-                if (data.reservas.politicaModificacion) {
-                    document.querySelector('.politica-item:nth-child(2) p').textContent = data.reservas.politicaModificacion;
-                }
-                if (data.reservas.politicaAbono) {
-                    document.querySelector('.politica-item:nth-child(3) p').textContent = data.reservas.politicaAbono;
-                }
+            // Activar enlace correspondiente
+            const activeLink = document.querySelector(`[data-section="${sectionId}"]`);
+            if (activeLink) {
+                activeLink.classList.add('active');
             }
             
-            // 3. Actualizar datos bancarios
-            const pagoMethods = document.querySelectorAll('.pago-method');
-            if (data.reservas && pagoMethods.length >= 2) {
-                // Bancolombia
-                if (data.reservas.bancoNombre && data.reservas.cuentaNumero) {
-                    pagoMethods[0].querySelector('h4').textContent = data.reservas.bancoNombre;
-                    pagoMethods[0].querySelector('p strong').textContent = data.reservas.cuentaTipo || 'Ahorros';
-                    pagoMethods[0].querySelector('p strong').nextSibling.textContent = `: ${data.reservas.cuentaNumero}`;
-                    pagoMethods[0].querySelector('p:nth-child(3)').textContent = `A nombre de ${data.reservas.cuentaNombre || 'María Mendoza'}`;
-                }
+            // Actualizar URL
+            window.location.hash = sectionId;
+        }
+        
+        // Manejar clics en enlaces de navegación
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const sectionId = this.getAttribute('data-section');
+                showSection(sectionId);
+            });
+        });
+        
+        // Manejar clics en botones que navegan a secciones
+        document.querySelectorAll('.nav-section-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const sectionId = this.getAttribute('data-section');
+                showSection(sectionId);
+            });
+        });
+        
+        // Cargar sección basada en el hash de la URL
+        function loadInitialSection() {
+            const hash = window.location.hash.substring(1);
+            if (hash && ['inicio', 'menu', 'arma-almuerzo', 'reservas'].includes(hash)) {
+                showSection(hash);
+            } else {
+                showSection('inicio');
+            }
+        }
+        
+        loadInitialSection();
+        
+        // ===== Verificar si el PDF se carga =====
+        function checkPdfLoaded() {
+            const pdfIframe = document.querySelector('.pdf-viewer');
+            const pdfMessage = document.getElementById('pdf-message');
+            
+            if (pdfIframe) {
+                // Después de 3 segundos, verificar si el PDF cargó
+                setTimeout(function() {
+                    try {
+                        // Intentar acceder al contenido del iframe
+                        const iframeDoc = pdfIframe.contentDocument || pdfIframe.contentWindow.document;
+                        
+                        // Si no hay contenido o hay error, mostrar mensaje
+                        if (!iframeDoc || iframeDoc.body.innerHTML.includes('404') || iframeDoc.body.innerHTML.includes('Error')) {
+                            pdfMessage.style.display = 'block';
+                        }
+                    } catch (error) {
+                        // Error de CORS, mostrar mensaje
+                        pdfMessage.style.display = 'block';
+                    }
+                }, 3000);
+            }
+        }
+        
+        // Verificar PDF al cargar la página
+        checkPdfLoaded();
+        
+        // ===== Sistema "Arma tu Almuerzo" =====
+        const optionCards = document.querySelectorAll('.option-card');
+        const selectedItemsContainer = document.getElementById('selectedItems');
+        const totalAmountElement = document.getElementById('totalAmount');
+        const paraLlevarCheckbox = document.getElementById('paraLlevar');
+        const sendOrderBtn = document.getElementById('sendOrderBtn');
+        
+        let selectedItems = [];
+        let total = 0;
+        
+        function updateTotal() {
+            total = selectedItems.reduce((sum, item) => sum + item.price, 0);
+            
+            if (paraLlevarCheckbox.checked) {
+                total += parseInt(paraLlevarCheckbox.value);
+            }
+            
+            totalAmountElement.textContent = '$' + total.toLocaleString();
+        }
+        
+        function updateSelectedItemsDisplay() {
+            if (selectedItems.length === 0) {
+                selectedItemsContainer.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📝</div>
+                        <p class="empty-text">Selecciona los ítems de tu almuerzo</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            selectedItems.forEach((item, index) => {
+                html += `
+                    <div class="selected-item">
+                        <div class="selected-item-info">
+                            <span class="selected-item-name">${item.name}</span>
+                            <span class="selected-item-price">$${item.price.toLocaleString()}</span>
+                        </div>
+                        <button class="remove-item-btn" data-index="${index}">×</button>
+                    </div>
+                `;
+            });
+            
+            selectedItemsContainer.innerHTML = html;
+            
+            // Agregar eventos a botones de eliminar
+            document.querySelectorAll('.remove-item-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const index = parseInt(this.getAttribute('data-index'));
+                    selectedItems.splice(index, 1);
+                    updateSelectedItemsDisplay();
+                    updateTotal();
+                });
+            });
+        }
+        
+        optionCards.forEach(card => {
+            card.addEventListener('click', function() {
+                const name = this.getAttribute('data-name');
+                const price = parseInt(this.getAttribute('data-price'));
                 
-                // Nequi
-                if (data.reservas.nequiNumero) {
-                    pagoMethods[1].querySelector('strong').textContent = data.reservas.nequiNumero;
-                    pagoMethods[1].querySelector('p:nth-child(3)').textContent = `A nombre de ${data.reservas.cuentaNombre || 'María Mendoza'}`;
-                }
+                // Agregar al carrito
+                selectedItems.push({ name, price });
+                
+                updateSelectedItemsDisplay();
+                updateTotal();
+            });
+        });
+        
+        paraLlevarCheckbox.addEventListener('change', updateTotal);
+        
+        sendOrderBtn.addEventListener('click', function() {
+            if (selectedItems.length === 0) {
+                alert('Por favor selecciona al menos un ítem para tu almuerzo.');
+                return;
             }
             
-            console.log('✅ Datos cargados correctamente desde el servidor');
-        })
-        .catch(error => console.error('Error cargando datos:', error));
-});
-
-</script>
-<script src="js/main.js"></script>
-<script src="js/dynamic-content.js"></script>
+            let message = '¡Hola! Me gustaría ordenar:\n\n';
+            
+            selectedItems.forEach(item => {
+                message += `• ${item.name} - $${item.price.toLocaleString()}\n`;
+            });
+            
+            if (paraLlevarCheckbox.checked) {
+                message += `\n• Para llevar - $1.000\n`;
+            }
+            
+            message += `\n*Total: $${total.toLocaleString()}*\n`;
+            message += '\nGracias.';
+            
+            const phoneNumber = '573150118386';
+            const encodedMessage = encodeURIComponent(message);
+            const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+            
+            window.open(whatsappUrl, '_blank');
+        });
+        
+        // ===== Funcionalidad del formulario de reservas =====
+        const reservaForm = document.getElementById('reservaForm');
+        
+        reservaForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const personas = document.getElementById('personas').value;
+            const hora = document.getElementById('hora').value;
+            const fecha = document.getElementById('fecha').value;
+            const plato = document.getElementById('plato').value;
+            const observaciones = document.getElementById('observaciones').value;
+            
+            let message = '¡Hola! Me gustaría hacer una reserva:\n\n';
+            message += `*Número de personas:* ${personas}\n`;
+            message += `*Fecha:* ${fecha}\n`;
+            message += `*Hora:* ${hora}\n`;
+            
+            if (plato) {
+                message += `*Plato especial:* ${plato}\n`;
+            }
+            
+            if (observaciones) {
+                message += `*Observaciones:* ${observaciones}\n`;
+            }
+            
+            message += '\nGracias.';
+            
+            const phoneNumber = '573150118386';
+            const encodedMessage = encodeURIComponent(message);
+            const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+            
+            window.open(whatsappUrl, '_blank');
+        });
+        
+        // Establecer fecha mínima para el campo de fecha (hoy)
+        const fechaInput = document.getElementById('fecha');
+        if (fechaInput) {
+            const today = new Date().toISOString().split('T')[0];
+            fechaInput.min = today;
+        }
+        
+        // Si hay un error al cargar imágenes, ocultarlas
+        document.querySelectorAll('img').forEach(img => {
+            img.onerror = function() {
+                this.style.display = 'none';
+            };
+        });
+        
+        // Ajustar altura del PDF según el dispositivo
+        function adjustPdfHeight() {
+            const pdfIframe = document.querySelector('.pdf-viewer');
+            
+            if (!pdfIframe) return;
+            
+            const isMobile = window.innerWidth <= 768;
+            const isTablet = window.innerWidth <= 1024;
+            
+            if (isMobile) {
+                pdfIframe.style.height = '400px';
+            } else if (isTablet) {
+                pdfIframe.style.height = '500px';
+            } else {
+                pdfIframe.style.height = '700px';
+            }
+        }
+        
+        window.addEventListener('resize', adjustPdfHeight);
+        setTimeout(adjustPdfHeight, 100);
+    });
+    </script>
 </body>
 </html>
