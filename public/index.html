@@ -128,6 +128,12 @@
                                     <p class="option-price">$4.000</p>
                                 </div>
                             </div>
+                            <div class="options-grid-simple" id="dynamic-options">
+                             <!-- Las opciones se cargarán aquí dinámicamente -->
+                                <div class="loading-options">
+                               <p>Cargando opciones del menú...</p>
+                                </div>
+                           </div>
                             
                             <div class="option-card" data-name="Papas a la Francesa" data-price="5200">
                                 <div class="option-icon">🍟</div>
@@ -483,8 +489,9 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(error => console.error('Error cargando datos:', error));
 });
+
 </script>
-
-
+<script src="js/main.js"></script>
+<script src="js/dynamic-content.js"></script>
 </body>
 </html>

@@ -1,18 +1,21 @@
-// server/server.js
+// server/server.js - VERSIÓN SIMPLIFICADA Y ORGANIZADA
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const multer = require('multer'); // Para subir archivos
+const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
+// Importar funciones del admin
+const adminFunctions = require('./admin-functions');
+
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // Configuración
 app.use(cors());
 app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, '../public'))); // Sirve los archivos del frontend
+app.use(express.static(path.join(__dirname, '../public')));
 
 // Configuración de subida de archivos (PDF)
 const storage = multer.diskStorage({
@@ -20,64 +23,53 @@ const storage = multer.diskStorage({
         cb(null, path.join(__dirname, '../public/images/'))
     },
     filename: function (req, file, cb) {
-        cb(null, 'menu-actual.pdf') // Siempre lo guarda con este nombre para reemplazar el anterior
+        cb(null, 'menu-actual.pdf')
     }
 });
 const upload = multer({ storage: storage });
 
-// BASE DE DATOS SIMPLE (Un archivo JSON)
-const DATA_FILE = path.join(__dirname, 'data.json');
+// ===== RUTAS API =====
 
-// Función para leer datos
-function leerDatos() {
-    if (!fs.existsSync(DATA_FILE)) {
-        // Datos por defecto si el archivo no existe
-        return {
-            historia: "Bienvenidos a Maná Restobar...",
-            reservas: { politicaCancelacion: "24 horas antes", bancoNombre: "Bancolombia" },
-            almuerzos: [] // Lista de comidas
-        };
+// 1. OBTENER TODOS LOS DATOS
+app.get('/api/data', (req, res) => {
+    try {
+        const data = adminFunctions.obtenerTodosDatos();
+        res.json(data);
+    } catch (error) {
+        res.status(500).json({ error: 'Error leyendo datos' });
     }
-    return JSON.parse(fs.readFileSync(DATA_FILE));
-}
+});
 
-// Función para guardar datos
-function guardarDatos(data) {
-    fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
-}
-
-// --- RUTAS API ---
-
-// 1. LOGIN
-// BUSCA ESTE BLOQUE EN TU ARCHIVO Y MODIFÍCALO:
-
+// 2. LOGIN SIMPLE
 app.post('/api/auth/login', (req, res) => {
     const { username, password } = req.body;
     
-    // USAR ESTAS CREDENCIALES (cambia si quieres otra)
-    if (username === 'admin' && password === 'admin123') {
-        res.json({ success: true, token: 'token-falso-seguro-123', admin: { username: 'Admin' } });
+    // Obtener contraseña actual desde data.json
+    const data = adminFunctions.leerDatos();
+    const currentPassword = data.config?.password || 'Patoazul';
+    
+    if (username === 'admin' && password === currentPassword) {
+        res.json({ 
+            success: true, 
+            token: 'token-falso-seguro-123', 
+            admin: { username: 'Admin' } 
+        });
     } else {
-        res.status(401).json({ success: false, error: 'Credenciales incorrectas' });
+        res.status(401).json({ 
+            success: false, 
+            error: 'Credenciales incorrectas' 
+        });
     }
-});
-
-app.get('/api/auth/verify', (req, res) => {
-    res.json({ valid: true }); // Simplificado para este ejemplo
-});
-
-// 2. OBTENER TODA LA INFORMACIÓN
-app.get('/api/data', (req, res) => {
-    const data = leerDatos();
-    res.json(data);
 });
 
 // 3. GUARDAR HISTORIA
 app.post('/api/historia', (req, res) => {
-    const data = leerDatos();
-    data.historia = req.body.texto;
-    guardarDatos(data);
-    res.json({ success: true });
+    try {
+        const result = adminFunctions.guardarHistoria(req.body.texto);
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({ error: 'Error guardando historia' });
+    }
 });
 
 // 4. SUBIR PDF
@@ -88,31 +80,55 @@ app.post('/api/menu/pdf', upload.single('pdf'), (req, res) => {
     res.json({ success: true, url: '/images/menu-actual.pdf' });
 });
 
-// 5. GESTIONAR ALMUERZOS (Arma tu almuerzo)
+// 5. GESTIONAR ALMUERZOS
 app.post('/api/almuerzos', (req, res) => {
-    const data = leerDatos();
-    const nuevaComida = { id: Date.now(), nombre: req.body.nombre, precio: req.body.precio };
-    data.almuerzos.push(nuevaComida);
-    guardarDatos(data);
-    res.json({ success: true, almuerzos: data.almuerzos });
+    try {
+        const { nombre, precio } = req.body;
+        const result = adminFunctions.agregarAlmuerzo(nombre, precio);
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({ error: 'Error agregando almuerzo' });
+    }
 });
 
 app.delete('/api/almuerzos/:id', (req, res) => {
-    const data = leerDatos();
-    data.almuerzos = data.almuerzos.filter(item => item.id != req.params.id);
-    guardarDatos(data);
-    res.json({ success: true, almuerzos: data.almuerzos });
+    try {
+        const result = adminFunctions.eliminarAlmuerzo(req.params.id);
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({ error: 'Error eliminando almuerzo' });
+    }
 });
 
 // 6. GUARDAR RESERVAS
 app.post('/api/reservas', (req, res) => {
-    const data = leerDatos();
-    data.reservas = req.body; // Guarda todo el objeto de configuración
-    guardarDatos(data);
-    res.json({ success: true });
+    try {
+        const result = adminFunctions.guardarReservas(req.body);
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({ error: 'Error guardando reservas' });
+    }
+});
+
+// 7. CAMBIAR CONTRASEÑA
+app.post('/api/change-password', (req, res) => {
+    try {
+        const { currentPassword, newPassword } = req.body;
+        const result = adminFunctions.cambiarPassword(currentPassword, newPassword);
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({ error: 'Error cambiando contraseña' });
+    }
+});
+
+// 8. VERIFICAR TOKEN (simplificado)
+app.get('/api/auth/verify', (req, res) => {
+    res.json({ valid: true });
 });
 
 // Iniciar servidor
 app.listen(PORT, () => {
-    console.log(`Servidor corriendo en http://localhost:${PORT}`);
+    console.log(`✅ Servidor corriendo en http://localhost:${PORT}`);
+    console.log(`📁 Panel admin: http://localhost:${PORT}/admin.html`);
+    console.log(`🔑 Usuario: admin | Contraseña: ${adminFunctions.leerDatos().config?.password || 'Patoazul'}`);
 });

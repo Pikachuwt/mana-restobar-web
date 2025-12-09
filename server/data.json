@@ -14,7 +14,7 @@
 }
 
 {
-  "historia": "Bienvenidos a Maná Restobar... 11 meses de funcionamiento desde el 29 de enero. Participamos en 2 concursos Burger Show (600 y 700 hamburguesas). Negocio familiar con chef especializado y alianzas con Bimbo y otros aliados.",
+  "historia": "11 meses de funcionamiento desde el 29 de enero. Participamos en 2 concursos Burger Show (600 y 700 hamburguesas). Negocio familiar con chef especializado y alianzas con Bimbo y otros aliados.",
   "reservas": {
     "politicaCancelacion": "Se puede cancelar sin costo hasta 2 días antes de la fecha de la reserva.",
     "politicaModificacion": "Se puede modificar la reserva hasta 8 horas antes.",
@@ -31,8 +31,9 @@
     { "id": 3, "nombre": "Carnes (Res, Cerdo o Pechuga)", "precio": "8900" },
     { "id": 4, "nombre": "Sopa de día", "precio": "5000" },
     { "id": 5, "nombre": "Tajadas de Maduro", "precio": "3000" },
-    { "id": 6, "nombre": "Maíz", "precio": "3000" },
-    { "id": 7, "nombre": "Tocineta", "precio": "3000" },
-    { "id": 8, "nombre": "Ensalada del día", "precio": "3200" }
-  ]
+    { "id": 6, "nombre": "Maíz", "precio": "3000" }
+  ],
+  "config": {
+    "password": "Patoazul"
+  }
 }
