@@ -1,5 +1,5 @@
 {
-  "historia": "11 meses de funcionamiento desde el 29 de enero. Participamos en 2 concursos Burger Show (600 y 700 hamburguesas). Negocio familiar con chef especializado y alianzas con Bimbo y otros aliados. wiwiwiwiwiwwiiiiiii",
+  "historia": "11 meses de funcionamiento desde el 29 de enero. Participamos en 2 concursos Burger Show (600 y 700 hamburguesas). Negocio familiar con chef especializado y alianzas con Bimbo y otros ali",
   "reservas": {
     "politicaCancelacion": "Se puede cancelar sin costo hasta 2 días antes de la fecha de la reserva.",
     "politicaModificacion": "Se puede modificar la reserva hasta 8 horas antes.",
@@ -40,6 +40,11 @@
       "id": 6,
       "nombre": "Maíz",
       "precio": "3000"
+    },
+    {
+      "id": 1765312166207,
+      "nombre": "pato",
+      "precio": "5000000000000"
     }
   ],
   "config": {
