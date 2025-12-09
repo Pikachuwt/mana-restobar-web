@@ -73,45 +73,58 @@ app.get('/api/data', (req, res) => {
 });
 
 // 2. LOGIN SIMPLE
+// Busca la ruta de login (alrededor de línea 45-60)
 app.post('/api/auth/login', (req, res) => {
+    const { username, password } = req.body;
+    
+    // Obtener credenciales actuales desde data.json
+    const data = adminFunctions.leerDatos();
+    const currentUsername = data.config?.username || 'admin';
+    const currentPassword = data.config?.password || 'Patoazul';
+    
+    if (username === currentUsername && password === currentPassword) {
+        res.json({ 
+            success: true, 
+            token: 'token-falso-seguro-123', 
+            admin: { 
+                username: currentUsername,
+                lastLogin: new Date().toISOString()
+            } 
+        });
+    } else {
+        res.status(401).json({ 
+            success: false, 
+            error: 'Credenciales incorrectas' 
+        });
+    }
+});
+
+// Agrega esto después de la ruta de change-password
+app.post('/api/change-username', (req, res) => {
     try {
-        const { username, password } = req.body;
+        const { currentPassword, newUsername } = req.body;
         
-        // Validaciones básicas
-        if (!username || !password) {
+        if (!currentPassword || !newUsername) {
             return res.status(400).json({ 
                 success: false, 
-                error: 'Usuario y contraseña son requeridos' 
+                error: 'La contraseña actual y el nuevo nombre de usuario son requeridos' 
             });
         }
         
-        // Obtener contraseña actual desde data.json
-        const data = adminFunctions.leerDatos();
-        const currentPassword = data.config?.password || 'Patoazul';
-        
-        if (username === 'admin' && password === currentPassword) {
-            console.log(`✅ Login exitoso para usuario: ${username}`);
-            
-            res.json({ 
-                success: true, 
-                token: 'token-falso-seguro-123', 
-                admin: { 
-                    username: 'Admin',
-                    lastLogin: new Date().toISOString()
-                } 
-            });
-        } else {
-            console.log(`❌ Intento de login fallido para usuario: ${username}`);
-            res.status(401).json({ 
+        if (newUsername.length < 3) {
+            return res.status(400).json({ 
                 success: false, 
-                error: 'Credenciales incorrectas' 
+                error: 'El nombre de usuario debe tener al menos 3 caracteres' 
             });
         }
+        
+        const result = adminFunctions.cambiarUsername(currentPassword, newUsername);
+        res.json(result);
     } catch (error) {
-        console.error('❌ Error en /api/auth/login:', error);
+        console.error('❌ Error en /api/change-username:', error);
         res.status(500).json({ 
             success: false, 
-            error: 'Error en el servidor' 
+            error: 'Error cambiando nombre de usuario' 
         });
     }
 });
@@ -339,32 +352,21 @@ app.use((err, req, res, next) => {
 });
 
 // ===== INICIAR SERVIDOR =====
+// Busca la parte del console.log inicial y actualízala:
 app.listen(PORT, () => {
     console.log('='.repeat(50));
     console.log(`✅ Servidor Maná Restobar iniciado`);
     console.log(`🌐 URL: http://localhost:${PORT}`);
     console.log(`📁 Panel admin: http://localhost:${PORT}/admin.html`);
-    console.log(`📊 API Health: http://localhost:${PORT}/api/health`);
-    console.log(`📄 API Data: http://localhost:${PORT}/api/data`);
     
-    // Mostrar credenciales
+    // Mostrar credenciales actuales
     try {
         const data = adminFunctions.leerDatos();
+        const username = data.config?.username || 'admin';
         const password = data.config?.password || 'Patoazul';
-        console.log(`🔑 Credenciales: admin / ${password}`);
+        console.log(`🔑 Credenciales: ${username} / ${password}`);
     } catch (error) {
         console.log(`🔑 Credenciales: admin / Patoazul (por defecto)`);
-    }
-    
-    // Mostrar estadísticas
-    try {
-        const data = adminFunctions.obtenerTodosDatos();
-        console.log(`📊 Datos cargados:`);
-        console.log(`   - Historia: ${data.historia ? '✅' : '❌'}`);
-        console.log(`   - Almuerzos: ${data.almuerzos?.length || 0} opciones`);
-        console.log(`   - Configuración: ${data.config ? '✅' : '❌'}`);
-    } catch (error) {
-        console.log(`⚠️ No se pudieron cargar las estadísticas: ${error.message}`);
     }
     
     console.log('='.repeat(50));

@@ -24,6 +24,89 @@
             justify-content: center;
             padding: 20px;
         }
+        /* Estilos para la pestaña de credenciales */
+.admin-subtitle {
+    color: #666;
+    margin-bottom: 25px;
+    font-size: 1rem;
+}
+
+.section-credentials {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+    border: 1px solid #e0e0e0;
+}
+
+.separator-credentials {
+    height: 1px;
+    background: linear-gradient(to right, transparent, #e0e0e0, transparent);
+    margin: 30px 0;
+}
+
+.form-hint {
+    display: block;
+    margin-top: 5px;
+    font-size: 0.85rem;
+    color: #888;
+}
+
+.btn-username {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.btn-password {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.current-credentials {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 30px;
+    border-left: 4px solid #667eea;
+}
+
+.credentials-display {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+}
+
+.credential-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.credential-item:last-child {
+    border-bottom: none;
+}
+
+.credential-label {
+    font-weight: 600;
+    color: #333;
+}
+
+.credential-value {
+    color: #667eea;
+    font-family: monospace;
+    font-weight: bold;
+}
+
+.credential-note {
+    margin-top: 15px;
+    font-size: 0.9rem;
+    color: #666;
+    font-style: italic;
+}
+
+
+
+
 
         .admin-container {
             width: 100%;
@@ -155,6 +238,7 @@
             border-bottom: 1px solid #e0e0e0;
             overflow-x: auto; /* Para móviles */
         }
+        
 
         .nav-btn {
             padding: 15px 25px;
@@ -333,6 +417,10 @@
             </div>
             
             <div class="admin-nav">
+
+                <button class="nav-btn" data-tab="credenciales-tab">
+                 <i class="fas fa-user-shield"></i> Credenciales
+                </button>
                 <button class="nav-btn active" data-tab="historia-tab">
                     <i class="fas fa-book-open"></i> Nuestra Historia
                 </button>
@@ -464,6 +552,78 @@
                         </button>
                     </div>
                 </div>
+                <div id="credenciales-tab" class="tab-content">
+    <div class="admin-card">
+        <h2><i class="fas fa-user-shield"></i> Cambiar Credenciales de Acceso</h2>
+        <p class="admin-subtitle">Actualiza tu nombre de usuario y/o contraseña para acceder al panel administrativo.</p>
+        
+        <!-- Sección 1: Cambiar Nombre de Usuario -->
+        <div class="section-credentials">
+            <h3><i class="fas fa-user-edit"></i> Cambiar Nombre de Usuario</h3>
+            <div class="form-group">
+                <label for="currentPasswordForUsername">Contraseña Actual (para verificar)</label>
+                <input type="password" id="currentPasswordForUsername" placeholder="Ingresa tu contraseña actual">
+            </div>
+            <div class="form-group">
+                <label for="newUsername">Nuevo Nombre de Usuario</label>
+                <input type="text" id="newUsername" placeholder="Elige un nuevo nombre de usuario">
+                <small class="form-hint">Mínimo 3 caracteres</small>
+            </div>
+            <button onclick="cambiarUsername()" class="btn-admin btn-username">
+                <i class="fas fa-user-edit"></i> Cambiar Nombre de Usuario
+            </button>
+        </div>
+        
+        <div class="separator-credentials"></div>
+        
+        <!-- Sección 2: Cambiar Contraseña -->
+        <div class="section-credentials">
+            <h3><i class="fas fa-key"></i> Cambiar Contraseña</h3>
+            <div class="form-group">
+                <label for="currentPassword">Contraseña Actual</label>
+                <input type="password" id="currentPassword" placeholder="Ingresa tu contraseña actual">
+            </div>
+            <div class="form-group">
+                <label for="newPassword">Nueva Contraseña</label>
+                <input type="password" id="newPassword" placeholder="Elige una nueva contraseña">
+            </div>
+            <div class="form-group">
+                <label for="confirmPassword">Confirmar Nueva Contraseña</label>
+                <input type="password" id="confirmPassword" placeholder="Repite la nueva contraseña">
+            </div>
+            <div class="password-rules">
+                <p><strong>Recomendaciones de seguridad:</strong></p>
+                <ul>
+                    <li>Mínimo 6 caracteres</li>
+                    <li>Combina letras y números</li>
+                    <li>Evita información personal obvia</li>
+                    <li>Anota la nueva contraseña en un lugar seguro</li>
+                </ul>
+            </div>
+            <button onclick="cambiarPassword()" class="btn-admin btn-password">
+                <i class="fas fa-sync-alt"></i> Cambiar Contraseña
+            </button>
+        </div>
+        
+        <div id="credentialMessage" style="margin-top: 20px; display: none;"></div>
+        
+        <!-- Sección 3: Credenciales Actuales -->
+        <div class="current-credentials">
+            <h3><i class="fas fa-info-circle"></i> Credenciales Actuales</h3>
+            <div class="credentials-display">
+                <div class="credential-item">
+                    <span class="credential-label">Nombre de Usuario:</span>
+                    <span class="credential-value" id="currentUsernameDisplay">admin</span>
+                </div>
+                <div class="credential-item">
+                    <span class="credential-label">Contraseña:</span>
+                    <span class="credential-value">••••••••</span>
+                </div>
+                <p class="credential-note">Estas credenciales son necesarias para acceder al panel administrativo.</p>
+               </div>
+              </div>
+                </div>
+             </div>
 
             </div>
         </div>
@@ -687,6 +847,12 @@
                 if(res.ok) alert('✅ Configuración de reservas guardada correctamente.');
             } catch(e) { alert('❌ Error al guardar configuración.'); }
         }
+
+
+
+
+
     </script>
+    
 </body>
 </html>
