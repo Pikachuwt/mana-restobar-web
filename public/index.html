@@ -112,10 +112,10 @@
                 <!-- Historia -->
                 <div class="historia-section">
                     <h2>Nuestra Historia</h2>
-                    <div class="historia-content">
-                        <p>11 meses de funcionamiento desde el 29 de enero. Participamos en 2 concursos Burger Show (600 y 700 hamburguesas).</p>
-                        <p>Negocio familiar con chef especializado y alianzas con Bimbo y otros aliados.</p>
-                    </div>
+                    <div class="historia-content" id="historia-dinamica">
+                     <!-- La historia se cargará aquí dinámicamente desde la API -->
+                     <p>Cargando historia...</p>
+<                       /div>
                 </div>
 
                 <div class="galeria-section">
@@ -576,6 +576,7 @@
         }
         
         loadInitialSection();
+        cargarHistoria();
         
         // ===== Verificar si el PDF se carga =====
         function checkPdfLoaded() {
@@ -771,6 +772,38 @@
         window.addEventListener('resize', adjustPdfHeight);
         setTimeout(adjustPdfHeight, 100);
     });
+
+// Agrega esta función al final de tu index.html, DENTRO de la etiqueta <script>
+function cargarHistoria() {
+    const historiaDiv = document.getElementById('historia-dinamica');
+    
+    // 1. Solicitamos el texto guardado a la ruta API que creaste
+    fetch('/api/historia')
+        .then(res => {
+            if (!res.ok) throw new Error('Error de red');
+            return res.json();
+        })
+        .then(data => {
+            // 2. Verificamos que la respuesta sea exitosa y contenga texto
+            if (data.success && data.texto) {
+                // Para que los saltos de línea se vean en HTML, los reemplazamos por <br>
+                const textoFormateado = data.texto.replace(/\n/g, '<br>');
+                historiaDiv.innerHTML = `<p>${textoFormateado}</p>`;
+            } else {
+                // En caso de que el dato esté vacío o la API no devuelva 'success: true'
+                historiaDiv.innerHTML = '<p>Aún no se ha definido la historia del restaurante.</p>';
+            }
+        })
+        .catch(error => {
+            // Manejo de errores
+            console.error('Error cargando la historia desde el servidor:', error);
+            historiaDiv.innerHTML = '<p>Lo sentimos, hubo un error al cargar la historia.</p>';
+        });
+}
+
+
+
     </script>
+     
 </body>
 </html>

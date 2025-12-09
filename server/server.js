@@ -153,6 +153,27 @@ app.post('/api/historia', (req, res) => {
     }
 });
 
+// 3.1 OBTENER HISTORIA (GET)
+app.get('/api/historia', (req, res) => {
+    try {
+        const data = adminFunctions.obtenerTodosDatos();
+        
+        // Devolver solo la historia
+        res.json({ 
+            success: true, 
+            texto: data.historia || '' 
+        });
+    } catch (error) {
+        console.error('❌ Error en GET /api/historia:', error);
+        res.status(500).json({ 
+            success: false, 
+            error: 'Error obteniendo historia' 
+        });
+    }
+});
+
+
+
 // 4. SUBIR PDF DEL MENÚ
 app.post('/api/menu/pdf', upload.single('pdf'), (req, res) => {
     try {
