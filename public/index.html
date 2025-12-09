@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=1.0, user-scalable=no">
+    <title>Maná Restobar - Pamplona</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header con fondo borroso -->
+    <header class="header" id="mainHeader">
+        <div class="container">
+            <div class="logo">
+                <img src="images/Logo.png.jpeg" alt="Maná Restobar">
+            </div>
+            <!-- Aproximadamente línea 47-55 -->
+<nav class="nav">
+    <ul>
+        <li><a href="#inicio" class="nav-link active" data-section="inicio">Inicio</a></li>
+        <li><a href="#menu" class="nav-link" data-section="menu">Menú</a></li>
+        <li><a href="#arma-almuerzo" class="nav-link" data-section="arma-almuerzo">Arma tu Almuerzo</a></li>
+        <li><a href="#reservas" class="nav-link" data-section="reservas">Reservas</a></li>
+    </ul>
+</nav>
+            <div class="social-icons">
+                <a href="https://www.facebook.com/profile.php?id=61572704497545" target="_blank" class="social-icon">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="https://www.instagram.com/mana_coffee_pam" target="_blank" class="social-icon">
+                    <i class="fab fa-instagram"></i>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenido dinámico -->
+    <main id="content">
+        <!-- Sección INICIO -->
+        <section id="inicio-section" class="section active">
+            <div class="hero">
+                <div class="container">
+                    <h1>Bienvenido a Maná Restobar</h1>
+                    <p>El corazón de Pamplona donde cada taza de café y cada plato se sirve con amor familiar.</p>
+                    <div class="hero-buttons">
+                        <a href="#menu" class="btn nav-section-btn" data-section="menu">Ver Menú</a>
+                        <a href="#reservas" class="btn btn-secondary nav-section-btn" data-section="reservas">Reservar Mesa</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="container">
+                <!-- Historia -->
+                <div class="historia-section">
+                    <h2>Nuestra Historia</h2>
+                    <div class="historia-content">
+                        <p>11 meses de funcionamiento desde el 29 de enero. Participamos en 2 concursos Burger Show (600 y 700 hamburguesas).</p>
+                        <p>Negocio familiar con chef especializado y alianzas con Bimbo y otros aliados.</p>
+                    </div>
+                </div>
+
+                <div class="galeria-section">
+    <h2>Un Vistazo a Nuestro Sabor</h2>
+    <p class="subtitle">Explora la variedad y calidad que nos caracteriza en cada plato que servimos.</p>
+    
+    <div class="collage-grid">
+        <!-- Collage de imágenes de nuestras comidas -->
+        <div class="collage-item">
+            <img src="images/comida1.jpg" alt="Plato especial del restaurante" loading="lazy">
+        </div>
+        <div class="collage-item">
+            <img src="images/comida2.jpg" alt="Plato gourmet" loading="lazy">
+        </div>
+        <div class="collage-item">
+            <img src="images/comida3.jpeg" alt="Especialidad de la casa" loading="lazy">
+        </div>
+        <div class="collage-item">
+            <img src="images/comida4.jpeg" alt="Menú ejecutivo" loading="lazy">
+        </div>
+        <div class="collage-item">
+            <img src="images/comida5.jpeg" alt="Plato tradicional" loading="lazy">
+        </div>
+        <div class="collage-item">
+            <img src="images/comida6.jpeg" alt="Especialidad culinaria" loading="lazy">
+        </div>
+    </div>
+</div>
+        </section>
+
+        <!-- Sección MENÚ -->
+        <section id="menu-section" class="section">
+            <div class="container">
+                <h2 class="section-title">Nuestro Menú</h2>
+                
+                <div class="menu-embed-container">
+                    <embed src="images/carta-completa.pdf.pdf" type="application/pdf" width="100%" height="500px">
+                </div>
+                
+                <div class="menu-types">
+                    <div class="menu-type-card">
+                        <h3>Menú Ejecutivo</h3>
+                        <p class="price">$15.000</p>
+                        <p class="desc">Cambia todos los días</p>
+                    </div>
+                    <div class="menu-type-card">
+                        <h3>Menú Especial</h3>
+                        <p class="price">$20.000</p>
+                        <p class="desc">Cambia todos los días</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección ARMA TU ALMUERZO -->
+        <section id="arma-almuerzo-section" class="section">
+            <div class="container">
+                <h2 class="section-title">Arma tu Almuerzo</h2>
+                
+                <div class="build-lunch-container-new">
+                    <!-- Parte izquierda - Opciones -->
+                    <div class="options-side">
+                        <div class="options-grid-simple">
+                            <div class="option-card" data-name="Arroz" data-price="4000">
+                                <div class="option-icon">🍚</div>
+                                <div class="option-details">
+                                    <h3 class="option-title">Arroz</h3>
+                                    <p class="option-price">$4.000</p>
+                                </div>
+                            </div>
+                            
+                            <div class="option-card" data-name="Papas a la Francesa" data-price="5200">
+                                <div class="option-icon">🍟</div>
+                                <div class="option-details">
+                                    <h3 class="option-title">Papas a la Francesa</h3>
+                                    <p class="option-price">$5.200</p>
+                                </div>
+                            </div>
+                            
+                            <div class="option-card" data-name="Carnes (Res, Cerdo o Pechuga)" data-price="8900">
+                                <div class="option-icon">🥩</div>
+                                <div class="option-details">
+                                    <h3 class="option-title">Carnes</h3>
+                                    <p class="option-subtitle">Res, Cerdo o Pechuga</p>
+                                    <p class="option-price">$8.900</p>
+                                </div>
+                            </div>
+                            
+                            <div class="option-card" data-name="Sopa de día" data-price="5000">
+                                <div class="option-icon">🥣</div>
+                                <div class="option-details">
+                                    <h3 class="option-title">Sopa de día</h3>
+                                    <p class="option-price">$5.000</p>
+                                </div>
+                            </div>
+                            
+                            <div class="option-card" data-name="Tajadas de Maduro" data-price="3000">
+                                <div class="option-icon">🍌</div>
+                                <div class="option-details">
+                                    <h3 class="option-title">Tajadas de Maduro</h3>
+                                    <p class="option-price">$3.000</p>
+                                </div>
+                            </div>
+                            
+                            <div class="option-card" data-name="Maíz" data-price="3000">
+                                <div class="option-icon">🌽</div>
+                                <div class="option-details">
+                                    <h3 class="option-title">Maíz</h3>
+                                    <p class="option-price">$3.000</p>
+                                </div>
+                            </div>
+                            
+                            <div class="option-card" data-name="Tocineta" data-price="3000">
+                                <div class="option-icon">🥓</div>
+                                <div class="option-details">
+                                    <h3 class="option-title">Tocineta</h3>
+                                    <p class="option-price">$3.000</p>
+                                </div>
+                            </div>
+                            
+                            <div class="option-card" data-name="Ensalada del día" data-price="3200">
+                                <div class="option-icon">🥗</div>
+                                <div class="option-details">
+                                    <h3 class="option-title">Ensalada del día</h3>
+                                    <p class="option-price">$3.200</p>
+                                </div>
+                            </div>
+                            
+                            <div class="option-card" data-name="Huevo" data-price="3000">
+                                <div class="option-icon">🥚</div>
+                                <div class="option-details">
+                                    <h3 class="option-title">Huevo</h3>
+                                    <p class="option-price">$3.000</p>
+                                </div>
+                            </div>
+                            
+                            <div class="option-card" data-name="Queso" data-price="3500">
+                                <div class="option-icon">🧀</div>
+                                <div class="option-details">
+                                    <h3 class="option-title">Queso</h3>
+                                    <p class="option-price">$3.500</p>
+                                </div>
+                            </div>
+                            
+                            <div class="option-card" data-name="Chorizo" data-price="4000">
+                                <div class="option-icon">🌭</div>
+                                <div class="option-details">
+                                    <h3 class="option-title">Chorizo</h3>
+                                    <p class="option-price">$4.000</p>
+                                </div>
+                            </div>
+                            
+                            <div class="option-card" data-name="Salchicha" data-price="3000">
+                                <div class="option-icon">🌭</div>
+                                <div class="option-details">
+                                    <h3 class="option-title">Salchicha</h3>
+                                    <p class="option-price">$3.000</p>
+                                </div>
+                            </div>
+                            
+                            <div class="option-card" data-name="Granos del día" data-price="4000">
+                                <div class="option-icon">🫘</div>
+                                <div class="option-details">
+                                    <h3 class="option-title">Granos del día</h3>
+                                    <p class="option-price">$4.000</p>
+                                </div>
+                            </div>
+                            
+                            <div class="option-card" data-name="Patacones" data-price="6500">
+                                <div class="option-icon">🍌</div>
+                                <div class="option-details">
+                                    <h3 class="option-title">Patacones</h3>
+                                    <p class="option-price">$6.500</p>
+                                </div>
+                            </div>
+                            
+                            <div class="option-card" data-name="Papas locas" data-price="9900">
+                                <div class="option-icon">🍟</div>
+                                <div class="option-details">
+                                    <h3 class="option-title">Papas locas</h3>
+                                    <p class="option-price">$9.900</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="note-box">
+                            <div class="note-icon">ℹ️</div>
+                            <p class="note-text">Todo pedido para llevar tiene un costo adicional de $1.000</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Parte derecha - Resumen -->
+                    <div class="summary-side">
+                        <div class="summary-card">
+                            <div class="summary-header">
+                                <h3 class="summary-title">Tu Pedido</h3>
+                                <p class="summary-subtitle">Resumen de tu almuerzo personalizado</p>
+                            </div>
+                            
+                            <div class="selected-items-container" id="selectedItems">
+                                <div class="empty-state">
+                                    <div class="empty-icon">📝</div>
+                                    <p class="empty-text">Selecciona los ítems de tu almuerzo</p>
+                                </div>
+                            </div>
+                            
+                            <div class="takeout-option">
+                                <label class="takeout-label">
+                                    <input type="checkbox" id="paraLlevar" value="1000">
+                                    <span class="custom-checkbox"></span>
+                                    <span class="takeout-text">Para Llevar (Costo Adicional)</span>
+                                    <span class="takeout-price">+ $1.000</span>
+                                </label>
+                            </div>
+                            
+                            <div class="total-box">
+                                <div class="total-content">
+                                    <span class="total-label">Total:</span>
+                                    <span class="total-amount" id="totalAmount">$0</span>
+                                </div>
+                            </div>
+                            
+                            <button class="btn btn-whatsapp-full" id="sendOrderBtn">
+                                <i class="fab fa-whatsapp"></i> Enviar Pedido a WhatsApp
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección RESERVAS -->
+        <section id="reservas-section" class="section">
+            <div class="container">
+                <h2 class="section-title">Reservas</h2>
+                
+                <div class="reservas-container">
+                    <div class="reserva-intro">
+                        <p>Asegura tu mesa en Maná Restobar. Completa el formulario para enviarnos los detalles por WhatsApp.</p>
+                    </div>
+                    
+                    <div class="reserva-form-card">
+                        <h3>Reserva tu Mesa</h3>
+                        <p class="form-subtitle">Completa tus datos y haz clic en el botón para coordinar tu reserva con nosotros.</p>
+                        
+                        <form id="reservaForm" class="reserva-form">
+                            <div class="form-group-row">
+                                <div class="form-group">
+                                    <label for="personas">Número de personas</label>
+                                    <input type="number" id="personas" placeholder="Ej: 4" min="1" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="hora">Hora</label>
+                                    <input type="time" id="hora" required>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group-row">
+                                <div class="form-group">
+                                    <label for="fecha">Fecha</label>
+                                    <input type="date" id="fecha" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="plato">Plato (opcional)</label>
+                                    <input type="text" id="plato" placeholder="Ej: Lasaña de vegetales">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="observaciones">Observaciones adicionales</label>
+                                <textarea id="observaciones" rows="3" placeholder="Alguna solicitud especial..."></textarea>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-whatsapp-full">
+                                <i class="fab fa-whatsapp"></i> Reservar por WhatsApp
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <div class="politicas-container">
+                        <h3>Política de Reservas</h3>
+                        <div class="politicas-list">
+                            <div class="politica-item">
+                                <h4>Cancelación</h4>
+                                <p>Se puede cancelar sin costo hasta 2 días antes de la fecha de la reserva.</p>
+                            </div>
+                            <div class="politica-item">
+                                <h4>Modificación</h4>
+                                <p>Se puede modificar la reserva hasta 8 horas antes.</p>
+                            </div>
+                            <div class="politica-item">
+                                <h4>Abono</h4>
+                                <p>Para eventos o platos especiales, se podría requerir un abono del 10% o 15% (configurable).</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="pagos-container">
+                        <h3>Medios de Pago</h3>
+                        <div class="pago-methods">
+                            <div class="pago-method">
+                                <h4>BANCOLOMBIA</h4>
+                                <p><strong>Ahorros:</strong> 47675777558</p>
+                                <p>A nombre de María Mendoza</p>
+                            </div>
+                            <div class="pago-method">
+                                <h4>Breve</h4>
+                                <p><strong>@3105539582</strong></p>
+                                <p>A nombre de María Mendoza</p>
+                            </div>
+                        </div>
+                        <p class="pago-nota">Por favor envíanos el comprobante, ya que será verificado.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Separador antes del footer -->
+    <div class="separator-footer"></div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="encuentranos-box">
+                        <h3>Encuéntranos</h3>
+                        <a href="https://maps.app.goo.gl/p7pAp6E8iJCrPEjY6" target="_blank" class="ubicacion-link">
+                            <p><strong>Pamplona, Norte de Santander</strong></p>
+                            <p>Estamos ubicados justo frente al Hospital San Juan de Dios de Pamplona.</p>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <div class="horarios-box">
+                        <h3>Horarios de atención</h3>
+                        <p><strong>Desayunos:</strong> 7:30 AM - 9:00 AM</p>
+                        <p><strong>Almuerzos:</strong> 12:00 AM - 3:00 PM</p>
+                        <p><strong>Comidas Rápidas:</strong> 5:00 PM - 9:00 PM</p>
+                        <p><strong>Cafetería:</strong> 7:30 AM - 9:00 PM</p>
+                        <p class="footer-lema">Un restaurante familiar con un ambiente acogedor para todos.</p>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <div class="contacto-box">
+                        <h3>Contacto</h3>
+                        <a href="https://api.whatsapp.com/send/?phone=573150118386" class="whatsapp-footer-link" target="_blank">
+                            <i class="fab fa-whatsapp"></i> WhatsApp: +57 315 011 8386
+                        </a>
+                        <div class="social-footer-icons">
+                            <a href="https://www.facebook.com/profile.php?id=61572704497545" target="_blank">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <a href="https://www.instagram.com/mana_coffee_pam" target="_blank">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 Maná Restobar. Todos los derechos reservados.</p>
+                <a href="admin.html" class="admin-link">Acceso Admin</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Administrativo - Maná Restobar</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* =========================================
+           TUS ESTILOS ORIGINALES (PRESERVADOS)
+           ========================================= */
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        .admin-body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .admin-container {
+            width: 100%;
+            max-width: 1200px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            min-height: 600px;
+            position: relative;
+        }
+
+        /* --- Panel de Login --- */
+        .login-panel {
+            padding: 60px 40px;
+            text-align: center;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .login-box {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .login-box h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.2rem;
+        }
+
+        .login-subtitle {
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 1rem;
+        }
+
+        .login-form .form-group {
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        .login-form label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .login-form input, 
+        .login-form textarea, 
+        .admin-card input[type="text"], 
+        .admin-card textarea {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            box-sizing: border-box; /* Importante para que no se salga del contenedor */
+        }
+
+        .login-form input:focus, 
+        .admin-card input:focus, 
+        .admin-card textarea:focus {
+            border-color: #667eea;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn-admin {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .btn-admin:hover {
+            transform: translateY(-2px);
+        }
+
+        /* --- Panel de Administración (Interior) --- */
+        .admin-panel {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            min-height: 600px;
+        }
+
+        .admin-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-logout {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.3s;
+        }
+
+        .btn-logout:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .admin-nav {
+            background: #f8f9fa;
+            padding: 0 40px;
+            display: flex;
+            gap: 10px;
+            border-bottom: 1px solid #e0e0e0;
+            overflow-x: auto; /* Para móviles */
+        }
+
+        .nav-btn {
+            padding: 15px 25px;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: #666;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .nav-btn.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            background: white;
+        }
+
+        .admin-content {
+            flex: 1;
+            padding: 30px 40px;
+            overflow-y: auto;
+            background-color: #fff;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .admin-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .admin-card h2 {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .admin-card h3 {
+            color: #555;
+            margin-top: 25px;
+            font-size: 1.1rem;
+        }
+
+        /* --- Estilos Nuevos para Lista de Almuerzos --- */
+        .lunch-list {
+            margin-top: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            background: white;
+        }
+
+        .lunch-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .lunch-item:last-child {
+            border-bottom: none;
+        }
+
+        .lunch-item span {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .btn-delete {
+            color: #dc3545;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 5px;
+            transition: background 0.2s;
+        }
+
+        .btn-delete:hover {
+            background: #ffe6e6;
+        }
+
+        .input-group-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .upload-area {
+            border: 3px dashed #ccc;
+            border-radius: 15px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+            margin-top: 20px;
+        }
+        
+        .upload-area:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .admin-nav {
+                padding: 0 10px;
+            }
+            .nav-btn {
+                padding: 12px 10px;
+                font-size: 0.9rem;
+            }
+            .admin-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body class="admin-body">
+    <div class="admin-container">
+        
+        <div id="loginPanel" class="login-panel">
+            <div class="login-box">
+                <h1><i class="fas fa-lock"></i> Panel Admin</h1>
+                <p class="login-subtitle">Maná Restobar</p>
+                
+                <form id="loginForm" class="login-form">
+                    <div class="form-group">
+                        <label for="username">Usuario</label>
+                        <input type="text" id="username" placeholder="Ingresa tu usuario" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">Contraseña</label>
+                        <input type="password" id="password" placeholder="Ingresa tu contraseña" required>
+                    </div>
+                    
+                    <button type="submit" class="btn-admin">
+                        <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                    </button>
+                </form>
+                
+                <a href="/" style="display:block; margin-top:20px; color:#667eea; text-decoration:none; font-weight:600;">
+                    <i class="fas fa-arrow-left"></i> Volver al sitio
+                </a>
+            </div>
+        </div>
+
+        <div id="adminPanel" class="admin-panel" style="display: none;">
+            <div class="admin-header">
+                <h1><i class="fas fa-cogs"></i> Panel de Control</h1>
+                <button id="logoutBtn" class="btn-logout">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                </button>
+            </div>
+            
+            <div class="admin-nav">
+                <button class="nav-btn active" data-tab="historia-tab">
+                    <i class="fas fa-book-open"></i> Nuestra Historia
+                </button>
+                <button class="nav-btn" data-tab="menu-tab">
+                    <i class="fas fa-file-pdf"></i> Menú PDF
+                </button>
+                <button class="nav-btn" data-tab="almuerzo-tab">
+                    <i class="fas fa-utensils"></i> Arma tu Almuerzo
+                </button>
+                <button class="nav-btn" data-tab="reservas-tab">
+                    <i class="fas fa-calendar-check"></i> Reservas
+                </button>
+            </div>
+            
+            <div class="admin-content">
+                
+                <div id="historia-tab" class="tab-content active">
+                    <div class="admin-card">
+                        <h2><i class="fas fa-edit"></i> Editar "Nuestra Historia"</h2>
+                        <p>Modifica el texto que aparece en la sección "Sobre Nosotros" de la página principal.</p>
+                        
+                        <div class="form-group">
+                            <label>Texto de la Historia:</label>
+                            <textarea id="textoHistoria" rows="8" placeholder="Escribe aquí la historia del restaurante..."></textarea>
+                        </div>
+                        
+                        <button onclick="guardarHistoria()" class="btn-admin" style="width: auto; padding: 12px 30px;">
+                            <i class="fas fa-save"></i> Guardar Cambios
+                        </button>
+                    </div>
+                </div>
+
+                <div id="menu-tab" class="tab-content">
+                    <div class="admin-card">
+                        <h2><i class="fas fa-file-upload"></i> Gestión del Menú</h2>
+                        
+                        <div style="background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #eee;">
+                            <h3>Menú Actual</h3>
+                            <p>El archivo actual se llama: <strong>menu-actual.pdf</strong></p>
+                            <a href="/images/menu-actual.pdf" target="_blank" style="color: #667eea; font-weight: bold; text-decoration: none;">
+                                <i class="fas fa-eye"></i> Ver PDF actual
+                            </a>
+                        </div>
+
+                        <div class="upload-area" onclick="document.getElementById('pdfInput').click()">
+                            <i class="fas fa-cloud-upload-alt" style="font-size: 3rem; color: #667eea; margin-bottom: 15px;"></i>
+                            <h3>Subir Nuevo PDF</h3>
+                            <p>Haz clic para seleccionar o arrastra el archivo aquí</p>
+                            <p style="font-size: 0.8rem; color: #999;">Reemplazará automáticamente al anterior</p>
+                            <input type="file" id="pdfInput" accept=".pdf" style="display: none;" onchange="manejarSeleccionPDF()">
+                        </div>
+                        
+                        <div id="pdfFileInfo" style="margin-top: 15px; font-weight: bold; color: #333; display: none;">
+                            Archivo seleccionado: <span id="pdfFileName"></span>
+                        </div>
+
+                        <button onclick="subirPDF()" class="btn-admin" style="margin-top: 20px;">
+                            <i class="fas fa-upload"></i> Actualizar Menú PDF
+                        </button>
+                    </div>
+                </div>
+
+                <div id="almuerzo-tab" class="tab-content">
+                    <div class="admin-card">
+                        <h2><i class="fas fa-carrot"></i> Ingredientes / Opciones</h2>
+                        <p>Agrega o elimina opciones disponibles para "Arma tu Almuerzo".</p>
+                        
+                        <div class="input-group-row">
+                            <input type="text" id="nuevoAlmuerzoNombre" placeholder="Nombre (ej: Arroz con Coco)" style="flex: 2;">
+                            <input type="number" id="nuevoAlmuerzoPrecio" placeholder="Precio (Opcional)" style="flex: 1;">
+                            <button onclick="agregarAlmuerzo()" class="btn-admin" style="width: auto; background: #28a745;">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+
+                        <h3>Lista Actual</h3>
+                        <div id="listaAlmuerzos" class="lunch-list">
+                            <div class="lunch-item" style="justify-content: center; color: #999;">
+                                Cargando opciones...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="reservas-tab" class="tab-content">
+                    <div class="admin-card">
+                        <h2><i class="fas fa-file-contract"></i> Políticas y Pagos</h2>
+                        
+                        <h3>Políticas</h3>
+                        <div class="form-group">
+                            <label>Política de Cancelación</label>
+                            <textarea id="politicaCancelacion" rows="2"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Política de Modificación</label>
+                            <textarea id="politicaModificacion" rows="2"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Política de Abono</label>
+                            <textarea id="politicaAbono" rows="2"></textarea>
+                        </div>
+
+                        <h3>Datos Bancarios</h3>
+                        <div class="input-group-row">
+                            <div style="flex: 1;">
+                                <label>Banco</label>
+                                <input type="text" id="bancoNombre">
+                            </div>
+                            <div style="flex: 1;">
+                                <label>Tipo de Cuenta</label>
+                                <input type="text" id="cuentaTipo">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Número de Cuenta</label>
+                            <input type="text" id="cuentaNumero">
+                        </div>
+                        <div class="form-group">
+                            <label>Nombre del Titular</label>
+                            <input type="text" id="cuentaNombre">
+                        </div>
+                        <div class="form-group">
+                            <label>Nequi / Daviplata</label>
+                            <input type="text" id="nequiNumero">
+                        </div>
+
+                        <button onclick="guardarReservas()" class="btn-admin" style="margin-top: 10px;">
+                            <i class="fas fa-save"></i> Guardar Configuración de Reservas
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Si el admin.html está en la carpeta 'public' y el server.js corre en el raíz,
+        // las rutas relativas (/api/...) funcionarán automáticamente.
+        const API_URL = '/api'; 
+
+        // --- 1. LOGIN ---
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const usuario = document.getElementById('username').value;
+            const contra = document.getElementById('password').value;
+            const btn = this.querySelector('button');
+
+            // Feedback visual
+            const textoOriginal = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
+
+            try {
+                const respuesta = await fetch(`${API_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: usuario, password: contra })
+                });
+
+                const data = await respuesta.json();
+
+                if (data.success) {
+                    // Login Exitoso
+                    document.getElementById('loginPanel').style.display = 'none';
+                    document.getElementById('adminPanel').style.display = 'flex';
+                    cargarTodosLosDatos(); // Cargar la info del servidor
+                } else {
+                    alert('❌ Error: ' + (data.error || 'Credenciales incorrectas'));
+                }
+            } catch (error) {
+                console.error(error);
+                alert('⚠️ Error de conexión. Asegúrate de iniciar el servidor con "node server/server.js" y entrar por localhost:3000');
+            } finally {
+                btn.innerHTML = textoOriginal;
+            }
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            location.reload(); // Recargar página para cerrar sesión simple
+        });
+
+        // --- 2. NAVEGACIÓN TABS ---
+        const tabs = document.querySelectorAll('.nav-btn');
+        const contents = document.querySelectorAll('.tab-content');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Quitar activo de todos
+                tabs.forEach(t => t.classList.remove('active'));
+                contents.forEach(c => c.classList.remove('active'));
+                
+                // Activar el clickeado
+                tab.classList.add('active');
+                const targetId = tab.getAttribute('data-tab');
+                document.getElementById(targetId).classList.add('active');
+            });
+        });
+
+        // --- 3. CARGAR DATOS GENERALES ---
+        async function cargarTodosLosDatos() {
+            try {
+                const res = await fetch(`${API_URL}/data`);
+                if (!res.ok) throw new Error('Error cargando datos');
+                const data = await res.json();
+
+                // Llenar Historia
+                if (data.historia) document.getElementById('textoHistoria').value = data.historia;
+
+                // Llenar Almuerzos
+                renderizarAlmuerzos(data.almuerzos || []);
+
+                // Llenar Reservas
+                if (data.reservas) {
+                    document.getElementById('politicaCancelacion').value = data.reservas.politicaCancelacion || '';
+                    document.getElementById('politicaModificacion').value = data.reservas.politicaModificacion || '';
+                    document.getElementById('politicaAbono').value = data.reservas.politicaAbono || '';
+                    document.getElementById('bancoNombre').value = data.reservas.bancoNombre || '';
+                    document.getElementById('cuentaNumero').value = data.reservas.cuentaNumero || '';
+                    document.getElementById('cuentaTipo').value = data.reservas.cuentaTipo || '';
+                    document.getElementById('cuentaNombre').value = data.reservas.cuentaNombre || '';
+                    document.getElementById('nequiNumero').value = data.reservas.nequiNumero || '';
+                }
+
+            } catch (error) {
+                console.error('Error al cargar datos iniciales:', error);
+            }
+        }
+
+        // --- 4. FUNCIONES DE HISTORIA ---
+        async function guardarHistoria() {
+            const texto = document.getElementById('textoHistoria').value;
+            try {
+                const res = await fetch(`${API_URL}/historia`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ texto })
+                });
+                if(res.ok) alert('✅ Historia actualizada correctamente en la página web.');
+            } catch(e) { alert('❌ Error al guardar'); }
+        }
+
+        // --- 5. FUNCIONES DE PDF ---
+        function manejarSeleccionPDF() {
+            const input = document.getElementById('pdfInput');
+            const info = document.getElementById('pdfFileInfo');
+            const name = document.getElementById('pdfFileName');
+            if (input.files.length > 0) {
+                info.style.display = 'block';
+                name.textContent = input.files[0].name;
+            }
+        }
+
+        async function subirPDF() {
+            const input = document.getElementById('pdfInput');
+            if (input.files.length === 0) return alert('⚠️ Por favor selecciona un archivo PDF primero.');
+
+            const formData = new FormData();
+            formData.append('pdf', input.files[0]);
+
+            const btn = document.querySelector('button[onclick="subirPDF()"]');
+            const txt = btn.innerHTML;
+            btn.innerHTML = 'Subiendo...';
+
+            try {
+                const res = await fetch(`${API_URL}/menu/pdf`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert('✅ PDF del menú actualizado exitosamente.');
+                    input.value = ''; // Limpiar input
+                    document.getElementById('pdfFileInfo').style.display = 'none';
+                } else {
+                    alert('❌ Error: ' + data.error);
+                }
+            } catch (error) {
+                alert('❌ Error al subir el archivo.');
+            } finally {
+                btn.innerHTML = txt;
+            }
+        }
+
+        // --- 6. FUNCIONES DE ALMUERZO ---
+        function renderizarAlmuerzos(lista) {
+            const contenedor = document.getElementById('listaAlmuerzos');
+            if (lista.length === 0) {
+                contenedor.innerHTML = '<div class="lunch-item" style="justify-content:center; color:#999;">No hay opciones creadas aún.</div>';
+                return;
+            }
+            
+            contenedor.innerHTML = lista.map(item => `
+                <div class="lunch-item">
+                    <div>
+                        <strong>${item.nombre}</strong>
+                        ${item.precio ? `<span style="color:#666; font-size:0.9em;"> - $${item.precio}</span>` : ''}
+                    </div>
+                    <i class="fas fa-trash-alt btn-delete" title="Eliminar" onclick="eliminarAlmuerzo(${item.id})"></i>
+                </div>
+            `).join('');
+        }
+
+        async function agregarAlmuerzo() {
+            const nombreInput = document.getElementById('nuevoAlmuerzoNombre');
+            const precioInput = document.getElementById('nuevoAlmuerzoPrecio');
+            const nombre = nombreInput.value.trim();
+            const precio = precioInput.value.trim();
+
+            if (!nombre) return alert('⚠️ Escribe el nombre del plato o ingrediente.');
+
+            try {
+                const res = await fetch(`${API_URL}/almuerzos`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nombre, precio })
+                });
+                const data = await res.json();
+                renderizarAlmuerzos(data.almuerzos);
+                nombreInput.value = ''; // Limpiar campos
+                precioInput.value = '';
+            } catch (e) { alert('Error al agregar'); }
+        }
+
+        async function eliminarAlmuerzo(id) {
+            if(!confirm('¿Estás seguro de eliminar esta opción?')) return;
+            try {
+                const res = await fetch(`${API_URL}/almuerzos/${id}`, { method: 'DELETE' });
+                const data = await res.json();
+                renderizarAlmuerzos(data.almuerzos);
+            } catch (e) { alert('Error al eliminar'); }
+        }
+
+        // --- 7. FUNCIONES DE RESERVAS ---
+        async function guardarReservas() {
+            const config = {
+                politicaCancelacion: document.getElementById('politicaCancelacion').value,
+                politicaModificacion: document.getElementById('politicaModificacion').value,
+                politicaAbono: document.getElementById('politicaAbono').value,
+                bancoNombre: document.getElementById('bancoNombre').value,
+                cuentaNumero: document.getElementById('cuentaNumero').value,
+                cuentaTipo: document.getElementById('cuentaTipo').value,
+                cuentaNombre: document.getElementById('cuentaNombre').value,
+                nequiNumero: document.getElementById('nequiNumero').value
+            };
+
+            try {
+                const res = await fetch(`${API_URL}/reservas`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(config)
+                });
+                if(res.ok) alert('✅ Configuración de reservas guardada correctamente.');
+            } catch(e) { alert('❌ Error al guardar configuración.'); }
+        }
+    </script>
+</body>
+</html>
