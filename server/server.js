@@ -350,6 +350,20 @@ app.use((err, req, res, next) => {
         message: process.env.NODE_ENV === 'development' ? err.message : undefined
     });
 });
+// ===== SERVIR LA APLICACIÓN REACT DEL ADMIN =====
+// Ruta para servir la aplicación React del admin
+app.use('/admin-react', express.static(path.join(__dirname, '../dist')));
+
+// Redirigir /admin a la nueva aplicación React
+app.get('/admin-react', (req, res) => {
+  res.sendFile(path.join(__dirname, '../dist/index.html'));
+});
+
+// Redirigir desde el admin.html antiguo al nuevo
+app.get('/admin.html', (req, res) => {
+  res.redirect('/admin-react');
+});
+
 
 // ===== INICIAR SERVIDOR =====
 // Busca la parte del console.log inicial y actualízala:
