@@ -432,5 +432,59 @@
     </footer>
 
     <script src="js/main.js"></script>
+    <!-- AGREGAR ESTO DESPUÉS de <script src="js/main.js"></script> -->
+<script>
+// Cargar datos dinámicos de la página principal
+document.addEventListener('DOMContentLoaded', function() {
+    // 1. Cargar historia dinámica
+    fetch('/api/data')
+        .then(response => response.json())
+        .then(data => {
+            // Actualizar la sección de historia
+            const historiaContainer = document.querySelector('.historia-content');
+            if (historiaContainer && data.historia) {
+                historiaContainer.innerHTML = `<p>${data.historia}</p>`;
+            }
+            
+            // 2. Actualizar políticas de reservas (si existen en el DOM)
+            const politicaItems = document.querySelectorAll('.politica-item p');
+            if (data.reservas && politicaItems.length >= 3) {
+                // Actualizar políticas si están en el HTML
+                if (data.reservas.politicaCancelacion) {
+                    document.querySelector('.politica-item:nth-child(1) p').textContent = data.reservas.politicaCancelacion;
+                }
+                if (data.reservas.politicaModificacion) {
+                    document.querySelector('.politica-item:nth-child(2) p').textContent = data.reservas.politicaModificacion;
+                }
+                if (data.reservas.politicaAbono) {
+                    document.querySelector('.politica-item:nth-child(3) p').textContent = data.reservas.politicaAbono;
+                }
+            }
+            
+            // 3. Actualizar datos bancarios
+            const pagoMethods = document.querySelectorAll('.pago-method');
+            if (data.reservas && pagoMethods.length >= 2) {
+                // Bancolombia
+                if (data.reservas.bancoNombre && data.reservas.cuentaNumero) {
+                    pagoMethods[0].querySelector('h4').textContent = data.reservas.bancoNombre;
+                    pagoMethods[0].querySelector('p strong').textContent = data.reservas.cuentaTipo || 'Ahorros';
+                    pagoMethods[0].querySelector('p strong').nextSibling.textContent = `: ${data.reservas.cuentaNumero}`;
+                    pagoMethods[0].querySelector('p:nth-child(3)').textContent = `A nombre de ${data.reservas.cuentaNombre || 'María Mendoza'}`;
+                }
+                
+                // Nequi
+                if (data.reservas.nequiNumero) {
+                    pagoMethods[1].querySelector('strong').textContent = data.reservas.nequiNumero;
+                    pagoMethods[1].querySelector('p:nth-child(3)').textContent = `A nombre de ${data.reservas.cuentaNombre || 'María Mendoza'}`;
+                }
+            }
+            
+            console.log('✅ Datos cargados correctamente desde el servidor');
+        })
+        .catch(error => console.error('Error cargando datos:', error));
+});
+</script>
+
+
 </body>
 </html>

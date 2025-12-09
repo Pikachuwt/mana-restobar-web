@@ -54,9 +54,8 @@ function guardarDatos(data) {
 app.post('/api/auth/login', (req, res) => {
     const { username, password } = req.body;
     
-    // CAMBIA 'mi_nueva_contraseña' POR LA QUE TÚ QUIERAS
-    if (username === 'admin' && password === 'Patoazul') {
-        // ... el resto del código se queda igual
+    // USAR ESTAS CREDENCIALES (cambia si quieres otra)
+    if (username === 'admin' && password === 'admin123') {
         res.json({ success: true, token: 'token-falso-seguro-123', admin: { username: 'Admin' } });
     } else {
         res.status(401).json({ success: false, error: 'Credenciales incorrectas' });
