@@ -9,19 +9,21 @@ const authController = {
             
             // Buscar admin
             const admin = await Admin.findOne({ username });
+            
             if (!admin) {
-                return res.status(401).json({ 
-                    success: false, 
-                    error: 'Credenciales incorrectas' 
+                return res.status(401).json({
+                    success: false,
+                    error: 'Credenciales incorrectas'
                 });
             }
             
             // Verificar contraseña
             const isPasswordValid = await bcrypt.compare(password, admin.password);
+            
             if (!isPasswordValid) {
-                return res.status(401).json({ 
-                    success: false, 
-                    error: 'Credenciales incorrectas' 
+                return res.status(401).json({
+                    success: false,
+                    error: 'Credenciales incorrectas'
                 });
             }
             
@@ -46,15 +48,16 @@ const authController = {
                     role: admin.role
                 }
             });
+            
         } catch (error) {
             console.error('Error en login:', error);
-            res.status(500).json({ 
-                success: false, 
-                error: 'Error del servidor' 
+            res.status(500).json({
+                success: false,
+                error: 'Error del servidor'
             });
         }
     },
-    
+
     verifyToken: async (req, res) => {
         try {
             res.json({
@@ -67,13 +70,13 @@ const authController = {
                 }
             });
         } catch (error) {
-            res.status(401).json({ 
-                success: false, 
-                error: 'Token inválido' 
+            res.status(401).json({
+                success: false,
+                error: 'Token inválido'
             });
         }
     },
-    
+
     changeUsername: async (req, res) => {
         try {
             const { currentPassword, newUsername } = req.body;
@@ -81,19 +84,20 @@ const authController = {
             
             // Verificar contraseña actual
             const isPasswordValid = await bcrypt.compare(currentPassword, admin.password);
+            
             if (!isPasswordValid) {
-                return res.status(401).json({ 
-                    success: false, 
-                    error: 'Contraseña actual incorrecta' 
+                return res.status(401).json({
+                    success: false,
+                    error: 'Contraseña actual incorrecta'
                 });
             }
             
             // Verificar si el nuevo username ya existe
             const existingAdmin = await Admin.findOne({ username: newUsername });
             if (existingAdmin && existingAdmin._id.toString() !== admin._id.toString()) {
-                return res.status(400).json({ 
-                    success: false, 
-                    error: 'El nombre de usuario ya está en uso' 
+                return res.status(400).json({
+                    success: false,
+                    error: 'El nombre de usuario ya está en uso'
                 });
             }
             
@@ -118,15 +122,16 @@ const authController = {
                     role: admin.role
                 }
             });
+            
         } catch (error) {
             console.error('Error cambiando username:', error);
-            res.status(500).json({ 
-                success: false, 
-                error: 'Error del servidor' 
+            res.status(500).json({
+                success: false,
+                error: 'Error del servidor'
             });
         }
     },
-    
+
     changePassword: async (req, res) => {
         try {
             const { currentPassword, newPassword } = req.body;
@@ -134,10 +139,11 @@ const authController = {
             
             // Verificar contraseña actual
             const isPasswordValid = await bcrypt.compare(currentPassword, admin.password);
+            
             if (!isPasswordValid) {
-                return res.status(401).json({ 
-                    success: false, 
-                    error: 'Contraseña actual incorrecta' 
+                return res.status(401).json({
+                    success: false,
+                    error: 'Contraseña actual incorrecta'
                 });
             }
             
@@ -149,11 +155,12 @@ const authController = {
                 success: true,
                 message: 'Contraseña actualizada exitosamente'
             });
+            
         } catch (error) {
             console.error('Error cambiando password:', error);
-            res.status(500).json({ 
-                success: false, 
-                error: 'Error del servidor' 
+            res.status(500).json({
+                success: false,
+                error: 'Error del servidor'
             });
         }
     }

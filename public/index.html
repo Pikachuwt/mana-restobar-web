@@ -165,41 +165,53 @@
         </section>
 
         <!-- Sección MENÚ -->
-        <section id="menu-section" class="section">
-            <div class="container">
-                <h2 class="section-title">Nuestro Menú</h2>
-                
-                <!-- Contenedor del PDF -->
-                <div class="pdf-container">
-                    <iframe 
-                        src="images/menu-actual.pdf" 
-                        class="pdf-viewer"
-                        title="Menú Maná Restobar"
-                        id="pdf-frame"
-                    >
-                        <p style="text-align: center; padding: 40px;">
-                            Tu navegador no puede mostrar el PDF. 
-                            <a href="images/menu-actual.pdf" download style="color: #d4af37; font-weight: bold;">
-                                Descarga el menú aquí
-                            </a>
-                        </p>
-                    </iframe>
-                </div>
-                
-                <div class="menu-types">
-                    <div class="menu-type-card">
-                        <h3>Menú Ejecutivo</h3>
-                        <p class="price">$15.000</p>
-                        <p class="desc">Cambia todos los días</p>
-                    </div>
-                    <div class="menu-type-card">
-                        <h3>Menú Especial</h3>
-                        <p class="price">$20.000</p>
-                        <p class="desc">Cambia todos los días</p>
-                    </div>
-                </div>
+        <!-- Sección MENÚ -->
+<section id="menu-section" class="section">
+    <div class="container">
+        <h2 class="section-title">Nuestro Menú</h2>
+        
+        <!-- Contenedor del PDF optimizado -->
+        <div class="pdf-container">
+            <div class="pdf-actions" style="text-align: center; margin-bottom: 20px;">
+                <a href="images/menu-actual.pdf" download class="btn" style="margin-right: 10px;">
+                    <i class="fas fa-download"></i> Descargar Menú
+                </a>
+                <a href="images/menu-actual.pdf" target="_blank" class="btn btn-secondary">
+                    <i class="fas fa-external-link-alt"></i> Abrir en nueva pestaña
+                </a>
             </div>
-        </section>
+            
+            <iframe 
+                src="images/menu-actual.pdf#view=FitH&toolbar=0&navpanes=0" 
+                class="pdf-viewer" 
+                title="Menú Maná Restobar"
+                id="pdf-frame"
+                loading="lazy">
+                <p style="text-align: center; padding: 40px;">
+                    Tu navegador no puede mostrar el PDF. 
+                    <a href="images/menu-actual.pdf" download style="color: #d4af37; font-weight: bold;">
+                        Descarga el menú aquí
+                    </a>
+                </p>
+            </iframe>
+        </div>
+        
+        <!-- Información adicional del menú -->
+        <div class="menu-types" style="margin-top: 40px;">
+            <div class="menu-type-card">
+                <h3>Menú Ejecutivo</h3>
+                <p class="price">$15.000</p>
+                <p class="desc">Cambia todos los días</p>
+            </div>
+            <div class="menu-type-card">
+                <h3>Menú Especial</h3>
+                <p class="price">$20.000</p>
+                <p class="desc">Cambia todos los días</p>
+            </div>
+        </div>
+    </div>
+</section>
+
 
         <!-- Sección ARMA TU ALMUERZO -->
         <section id="arma-almuerzo-section" class="section">
