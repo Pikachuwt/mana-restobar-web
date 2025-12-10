@@ -1,11 +1,10 @@
-// server/models/Historia.js
 const mongoose = require('mongoose');
 
 const historiaSchema = new mongoose.Schema({
     texto: {
         type: String,
         required: true,
-        default: ''
+        default: 'Bienvenidos a Maná Restobar, el corazón gastronómico de Pamplona, Norte de Santander.'
     },
     updatedAt: {
         type: Date,

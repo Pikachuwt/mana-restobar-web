@@ -7,19 +7,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* =========================================
-           TUS ESTILOS ORIGINALES (PRESERVADOS)
-           ========================================= */
-        
-        
-        
-           body, html {
+        body, html {
             margin: 0;
             padding: 0;
             font-family: 'Open Sans', sans-serif;
-        }
-
-        .admin-body {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
@@ -27,89 +18,6 @@
             justify-content: center;
             padding: 20px;
         }
-        /* Estilos para la pestaña de credenciales */
-.admin-subtitle {
-    color: #666;
-    margin-bottom: 25px;
-    font-size: 1rem;
-}
-
-.section-credentials {
-    background: white;
-    padding: 25px;
-    border-radius: 10px;
-    margin-bottom: 25px;
-    border: 1px solid #e0e0e0;
-}
-
-.separator-credentials {
-    height: 1px;
-    background: linear-gradient(to right, transparent, #e0e0e0, transparent);
-    margin: 30px 0;
-}
-
-.form-hint {
-    display: block;
-    margin-top: 5px;
-    font-size: 0.85rem;
-    color: #888;
-}
-
-.btn-username {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
-.btn-password {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-}
-
-.current-credentials {
-    background: #f8f9fa;
-    padding: 20px;
-    border-radius: 10px;
-    margin-top: 30px;
-    border-left: 4px solid #667eea;
-}
-
-.credentials-display {
-    background: white;
-    padding: 15px;
-    border-radius: 8px;
-    margin-top: 15px;
-}
-
-.credential-item {
-    display: flex;
-    justify-content: space-between;
-    padding: 10px 0;
-    border-bottom: 1px solid #eee;
-}
-
-.credential-item:last-child {
-    border-bottom: none;
-}
-
-.credential-label {
-    font-weight: 600;
-    color: #333;
-}
-
-.credential-value {
-    color: #667eea;
-    font-family: monospace;
-    font-weight: bold;
-}
-
-.credential-note {
-    margin-top: 15px;
-    font-size: 0.9rem;
-    color: #666;
-    font-style: italic;
-}
-
-
-
-
 
         .admin-container {
             width: 100%;
@@ -122,7 +30,7 @@
             position: relative;
         }
 
-        /* --- Panel de Login --- */
+        /* Panel de Login */
         .login-panel {
             padding: 60px 40px;
             text-align: center;
@@ -161,22 +69,17 @@
             font-weight: 600;
         }
 
-        .login-form input, 
-        .login-form textarea, 
-        .admin-card input[type="text"], 
-        .admin-card textarea {
+        .login-form input {
             width: 100%;
             padding: 14px 16px;
             border: 2px solid #e0e0e0;
             border-radius: 10px;
             font-size: 1rem;
             transition: all 0.3s;
-            box-sizing: border-box; /* Importante para que no se salga del contenedor */
+            box-sizing: border-box;
         }
 
-        .login-form input:focus, 
-        .admin-card input:focus, 
-        .admin-card textarea:focus {
+        .login-form input:focus {
             border-color: #667eea;
             outline: none;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
@@ -199,12 +102,13 @@
             transform: translateY(-2px);
         }
 
-        /* --- Panel de Administración (Interior) --- */
+        /* Panel de Administración */
         .admin-panel {
             display: flex;
             flex-direction: column;
             height: 100%;
             min-height: 600px;
+            display: none;
         }
 
         .admin-header {
@@ -239,9 +143,8 @@
             display: flex;
             gap: 10px;
             border-bottom: 1px solid #e0e0e0;
-            overflow-x: auto; /* Para móviles */
+            overflow-x: auto;
         }
-        
 
         .nav-btn {
             padding: 15px 25px;
@@ -306,13 +209,62 @@
             font-size: 1.1rem;
         }
 
-        /* --- Estilos Nuevos para Lista de Almuerzos --- */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            border-color: #667eea;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .input-group-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .input-group-row .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        /* Lista de almuerzos */
         .lunch-list {
             margin-top: 20px;
             border: 1px solid #e0e0e0;
             border-radius: 10px;
             overflow: hidden;
             background: white;
+            max-height: 400px;
+            overflow-y: auto;
         }
 
         .lunch-item {
@@ -338,18 +290,16 @@
             padding: 8px;
             border-radius: 5px;
             transition: background 0.2s;
+            background: none;
+            border: none;
+            font-size: 1.1rem;
         }
 
         .btn-delete:hover {
             background: #ffe6e6;
         }
 
-        .input-group-row {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
+        /* Upload area */
         .upload-area {
             border: 3px dashed #ccc;
             border-radius: 15px;
@@ -366,6 +316,130 @@
             background: #f0f4ff;
         }
 
+        /* Credenciales */
+        .admin-subtitle {
+            color: #666;
+            margin-bottom: 25px;
+            font-size: 1rem;
+        }
+
+        .section-credentials {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .separator-credentials {
+            height: 1px;
+            background: linear-gradient(to right, transparent, #e0e0e0, transparent);
+            margin: 30px 0;
+        }
+
+        .form-hint {
+            display: block;
+            margin-top: 5px;
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        .btn-username {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .btn-password {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .current-credentials {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+            border-left: 4px solid #667eea;
+        }
+
+        .credentials-display {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .credential-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .credential-item:last-child {
+            border-bottom: none;
+        }
+
+        .credential-label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .credential-value {
+            color: #667eea;
+            font-family: monospace;
+            font-weight: bold;
+        }
+
+        .credential-note {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: #666;
+            font-style: italic;
+        }
+
+        .password-rules {
+            background: #fff8e1;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            font-size: 0.9rem;
+        }
+
+        .password-rules ul {
+            margin: 10px 0 0 0;
+            padding-left: 20px;
+        }
+
+        .password-rules li {
+            margin-bottom: 5px;
+        }
+
+        /* Mensajes */
+        #message {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            display: none;
+        }
+
+        .message-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .message-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .admin-nav {
@@ -378,16 +452,20 @@
             .admin-content {
                 padding: 20px;
             }
+            .input-group-row {
+                flex-direction: column;
+                gap: 10px;
+            }
         }
     </style>
 </head>
-<body class="admin-body">
+<body>
     <div class="admin-container">
-        
+        <!-- Panel de Login -->
         <div id="loginPanel" class="login-panel">
             <div class="login-box">
                 <h1><i class="fas fa-lock"></i> Panel Admin</h1>
-                <p class="login-subtitle">Maná Restobar</p>
+                <p class="login-subtitle">Maná Restobar - Administración</p>
                 
                 <form id="loginForm" class="login-form">
                     <div class="form-group">
@@ -400,10 +478,22 @@
                         <input type="password" id="password" placeholder="Ingresa tu contraseña" required>
                     </div>
                     
+                    <div id="loginMessage" class="message-error" style="display: none;"></div>
+                    
                     <button type="submit" class="btn-admin">
                         <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
                     </button>
                 </form>
+                
+                <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee;">
+                    <p style="color: #666; font-size: 0.9rem; margin-bottom: 10px;">
+                        <strong>Credenciales por defecto:</strong>
+                    </p>
+                    <p style="color: #333; font-size: 0.9rem;">
+                        Usuario: <strong>admin</strong><br>
+                        Contraseña: <strong>admin123</strong>
+                    </p>
+                </div>
                 
                 <a href="/" style="display:block; margin-top:20px; color:#667eea; text-decoration:none; font-weight:600;">
                     <i class="fas fa-arrow-left"></i> Volver al sitio
@@ -411,18 +501,18 @@
             </div>
         </div>
 
-        <div id="adminPanel" class="admin-panel" style="display: none;">
+        <!-- Panel de Administración -->
+        <div id="adminPanel" class="admin-panel">
             <div class="admin-header">
-                <h1><i class="fas fa-cogs"></i> Panel de Control</h1>
+                <h1><i class="fas fa-cogs"></i> Panel de Control - Maná Restobar</h1>
                 <button id="logoutBtn" class="btn-logout">
                     <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
                 </button>
             </div>
             
             <div class="admin-nav">
-
                 <button class="nav-btn" data-tab="credenciales-tab">
-                 <i class="fas fa-user-shield"></i> Credenciales
+                    <i class="fas fa-user-shield"></i> Credenciales
                 </button>
                 <button class="nav-btn active" data-tab="historia-tab">
                     <i class="fas fa-book-open"></i> Nuestra Historia
@@ -439,7 +529,79 @@
             </div>
             
             <div class="admin-content">
+                <!-- Mensaje general -->
+                <div id="message" class="message-success"></div>
                 
+                <!-- Tab Credenciales -->
+                <div id="credenciales-tab" class="tab-content">
+                    <div class="admin-card">
+                        <h2><i class="fas fa-user-shield"></i> Cambiar Credenciales de Acceso</h2>
+                        <p class="admin-subtitle">Actualiza tu nombre de usuario y/o contraseña para acceder al panel administrativo.</p>
+                        
+                        <div class="section-credentials">
+                            <h3><i class="fas fa-user-edit"></i> Cambiar Nombre de Usuario</h3>
+                            <div class="form-group">
+                                <label for="currentPasswordForUsername">Contraseña Actual</label>
+                                <input type="password" id="currentPasswordForUsername" placeholder="Ingresa tu contraseña actual">
+                            </div>
+                            <div class="form-group">
+                                <label for="newUsername">Nuevo Nombre de Usuario</label>
+                                <input type="text" id="newUsername" placeholder="Elige un nuevo nombre de usuario">
+                                <small class="form-hint">Mínimo 3 caracteres</small>
+                            </div>
+                            <button onclick="cambiarUsername()" class="btn-admin btn-username">
+                                <i class="fas fa-user-edit"></i> Cambiar Nombre de Usuario
+                            </button>
+                        </div>
+                        
+                        <div class="separator-credentials"></div>
+                        
+                        <div class="section-credentials">
+                            <h3><i class="fas fa-key"></i> Cambiar Contraseña</h3>
+                            <div class="form-group">
+                                <label for="currentPassword">Contraseña Actual</label>
+                                <input type="password" id="currentPassword" placeholder="Ingresa tu contraseña actual">
+                            </div>
+                            <div class="form-group">
+                                <label for="newPassword">Nueva Contraseña</label>
+                                <input type="password" id="newPassword" placeholder="Elige una nueva contraseña">
+                            </div>
+                            <div class="form-group">
+                                <label for="confirmPassword">Confirmar Nueva Contraseña</label>
+                                <input type="password" id="confirmPassword" placeholder="Repite la nueva contraseña">
+                            </div>
+                            <div class="password-rules">
+                                <p><strong>Recomendaciones de seguridad:</strong></p>
+                                <ul>
+                                    <li>Mínimo 6 caracteres</li>
+                                    <li>Combina letras y números</li>
+                                    <li>Evita información personal obvia</li>
+                                    <li>Anota la nueva contraseña en un lugar seguro</li>
+                                </ul>
+                            </div>
+                            <button onclick="cambiarPassword()" class="btn-admin btn-password">
+                                <i class="fas fa-sync-alt"></i> Cambiar Contraseña
+                            </button>
+                        </div>
+                        
+                        <div class="current-credentials">
+                            <h3><i class="fas fa-info-circle"></i> Credenciales Actuales</h3>
+                            <div class="credentials-display">
+                                <div class="credential-item">
+                                    <span class="credential-label">Nombre de Usuario:</span>
+                                    <span class="credential-value" id="currentUsernameDisplay">admin</span>
+                                </div>
+                                <div class="credential-item">
+                                    <span class="credential-label">Contraseña:</span>
+                                    <span class="credential-value">••••••••</span>
+                                </div>
+                                <p class="credential-note">Estas credenciales son necesarias para acceder al panel administrativo.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tab Historia -->
                 <div id="historia-tab" class="tab-content active">
                     <div class="admin-card">
                         <h2><i class="fas fa-edit"></i> Editar "Nuestra Historia"</h2>
@@ -447,7 +609,7 @@
                         
                         <div class="form-group">
                             <label>Texto de la Historia:</label>
-                            <textarea id="textoHistoria" rows="8" placeholder="Escribe aquí la historia del restaurante..."></textarea>
+                            <textarea id="textoHistoria" rows="10" placeholder="Escribe aquí la historia del restaurante..."></textarea>
                         </div>
                         
                         <button onclick="guardarHistoria()" class="btn-admin" style="width: auto; padding: 12px 30px;">
@@ -455,15 +617,16 @@
                         </button>
                     </div>
                 </div>
-
+                
+                <!-- Tab Menú PDF -->
                 <div id="menu-tab" class="tab-content">
                     <div class="admin-card">
-                        <h2><i class="fas fa-file-upload"></i> Gestión del Menú</h2>
+                        <h2><i class="fas fa-file-upload"></i> Gestión del Menú PDF</h2>
                         
                         <div style="background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #eee;">
                             <h3>Menú Actual</h3>
-                            <p>El archivo actual se llama: <strong>menu-actual.pdf</strong></p>
-                            <a href="/images/menu-actual.pdf" target="_blank" style="color: #667eea; font-weight: bold; text-decoration: none;">
+                            <p>Archivo actual: <strong>menu-actual.pdf</strong></p>
+                            <a href="/images/menu-actual.pdf" target="_blank" style="color: #667eea; font-weight: bold; text-decoration: none; display: inline-block; margin-top: 10px;">
                                 <i class="fas fa-eye"></i> Ver PDF actual
                             </a>
                         </div>
@@ -472,7 +635,7 @@
                             <i class="fas fa-cloud-upload-alt" style="font-size: 3rem; color: #667eea; margin-bottom: 15px;"></i>
                             <h3>Subir Nuevo PDF</h3>
                             <p>Haz clic para seleccionar o arrastra el archivo aquí</p>
-                            <p style="font-size: 0.8rem; color: #999;">Reemplazará automáticamente al anterior</p>
+                            <p style="font-size: 0.8rem; color: #999;">Formatos aceptados: PDF (máximo 5MB)</p>
                             <input type="file" id="pdfInput" accept=".pdf" style="display: none;" onchange="manejarSeleccionPDF()">
                         </div>
                         
@@ -485,21 +648,42 @@
                         </button>
                     </div>
                 </div>
-
+                
+                <!-- Tab Almuerzo -->
                 <div id="almuerzo-tab" class="tab-content">
                     <div class="admin-card">
                         <h2><i class="fas fa-carrot"></i> Ingredientes / Opciones</h2>
                         <p>Agrega o elimina opciones disponibles para "Arma tu Almuerzo".</p>
                         
                         <div class="input-group-row">
-                            <input type="text" id="nuevoAlmuerzoNombre" placeholder="Nombre (ej: Arroz con Coco)" style="flex: 2;">
-                            <input type="number" id="nuevoAlmuerzoPrecio" placeholder="Precio (Opcional)" style="flex: 1;">
-                            <button onclick="agregarAlmuerzo()" class="btn-admin" style="width: auto; background: #28a745;">
-                                <i class="fas fa-plus"></i>
-                            </button>
+                            <div class="form-group">
+                                <label for="nuevoAlmuerzoNombre">Nombre</label>
+                                <input type="text" id="nuevoAlmuerzoNombre" placeholder="Ej: Arroz con Coco">
+                            </div>
+                            <div class="form-group">
+                                <label for="nuevoAlmuerzoPrecio">Precio ($)</label>
+                                <input type="number" id="nuevoAlmuerzoPrecio" placeholder="Ej: 5000" min="0">
+                            </div>
+                        </div>
+                        
+                        <div class="input-group-row">
+                            <div class="form-group">
+                                <label for="nuevoAlmuerzoCategoria">Categoría</label>
+                                <select id="nuevoAlmuerzoCategoria">
+                                    <option value="acompanamiento">Acompañamiento</option>
+                                    <option value="proteina">Proteína</option>
+                                    <option value="base">Base</option>
+                                    <option value="extra">Extra</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="align-self: flex-end;">
+                                <button onclick="agregarAlmuerzo()" class="btn-admin" style="background: #28a745;">
+                                    <i class="fas fa-plus"></i> Agregar
+                                </button>
+                            </div>
                         </div>
 
-                        <h3>Lista Actual</h3>
+                        <h3>Opciones Actuales</h3>
                         <div id="listaAlmuerzos" class="lunch-list">
                             <div class="lunch-item" style="justify-content: center; color: #999;">
                                 Cargando opciones...
@@ -507,132 +691,522 @@
                         </div>
                     </div>
                 </div>
-
+                
+                <!-- Tab Reservas -->
                 <div id="reservas-tab" class="tab-content">
                     <div class="admin-card">
                         <h2><i class="fas fa-file-contract"></i> Políticas y Pagos</h2>
                         
-                        <h3>Políticas</h3>
+                        <h3>Políticas de Reservas</h3>
                         <div class="form-group">
                             <label>Política de Cancelación</label>
-                            <textarea id="politicaCancelacion" rows="2"></textarea>
+                            <textarea id="politicaCancelacion" rows="3"></textarea>
                         </div>
                         <div class="form-group">
                             <label>Política de Modificación</label>
-                            <textarea id="politicaModificacion" rows="2"></textarea>
+                            <textarea id="politicaModificacion" rows="3"></textarea>
                         </div>
                         <div class="form-group">
                             <label>Política de Abono</label>
-                            <textarea id="politicaAbono" rows="2"></textarea>
+                            <textarea id="politicaAbono" rows="3"></textarea>
                         </div>
 
                         <h3>Datos Bancarios</h3>
                         <div class="input-group-row">
-                            <div style="flex: 1;">
+                            <div class="form-group">
                                 <label>Banco</label>
-                                <input type="text" id="bancoNombre">
+                                <input type="text" id="bancoNombre" placeholder="Ej: BANCOLOMBIA">
                             </div>
-                            <div style="flex: 1;">
+                            <div class="form-group">
                                 <label>Tipo de Cuenta</label>
-                                <input type="text" id="cuentaTipo">
+                                <input type="text" id="cuentaTipo" placeholder="Ej: Ahorros">
                             </div>
                         </div>
                         <div class="form-group">
                             <label>Número de Cuenta</label>
-                            <input type="text" id="cuentaNumero">
+                            <input type="text" id="cuentaNumero" placeholder="Ej: 47675777558">
                         </div>
                         <div class="form-group">
                             <label>Nombre del Titular</label>
-                            <input type="text" id="cuentaNombre">
+                            <input type="text" id="cuentaNombre" placeholder="Ej: María Mendoza">
                         </div>
                         <div class="form-group">
                             <label>Nequi / Daviplata</label>
-                            <input type="text" id="nequiNumero">
+                            <input type="text" id="nequiNumero" placeholder="Ej: 3105539582">
                         </div>
 
-                        <button onclick="guardarReservas()" class="btn-admin" style="margin-top: 10px;">
+                        <button onclick="guardarReservas()" class="btn-admin">
                             <i class="fas fa-save"></i> Guardar Configuración de Reservas
                         </button>
                     </div>
                 </div>
-                <div id="credenciales-tab" class="tab-content">
-    <div class="admin-card">
-        <h2><i class="fas fa-user-shield"></i> Cambiar Credenciales de Acceso</h2>
-        <p class="admin-subtitle">Actualiza tu nombre de usuario y/o contraseña para acceder al panel administrativo.</p>
-        
-        <!-- Sección 1: Cambiar Nombre de Usuario -->
-        <div class="section-credentials">
-            <h3><i class="fas fa-user-edit"></i> Cambiar Nombre de Usuario</h3>
-            <div class="form-group">
-                <label for="currentPasswordForUsername">Contraseña Actual (para verificar)</label>
-                <input type="password" id="currentPasswordForUsername" placeholder="Ingresa tu contraseña actual">
-            </div>
-            <div class="form-group">
-                <label for="newUsername">Nuevo Nombre de Usuario</label>
-                <input type="text" id="newUsername" placeholder="Elige un nuevo nombre de usuario">
-                <small class="form-hint">Mínimo 3 caracteres</small>
-            </div>
-            <button onclick="cambiarUsername()" class="btn-admin btn-username">
-                <i class="fas fa-user-edit"></i> Cambiar Nombre de Usuario
-            </button>
-        </div>
-        
-        <div class="separator-credentials"></div>
-        
-        <!-- Sección 2: Cambiar Contraseña -->
-        <div class="section-credentials">
-            <h3><i class="fas fa-key"></i> Cambiar Contraseña</h3>
-            <div class="form-group">
-                <label for="currentPassword">Contraseña Actual</label>
-                <input type="password" id="currentPassword" placeholder="Ingresa tu contraseña actual">
-            </div>
-            <div class="form-group">
-                <label for="newPassword">Nueva Contraseña</label>
-                <input type="password" id="newPassword" placeholder="Elige una nueva contraseña">
-            </div>
-            <div class="form-group">
-                <label for="confirmPassword">Confirmar Nueva Contraseña</label>
-                <input type="password" id="confirmPassword" placeholder="Repite la nueva contraseña">
-            </div>
-            <div class="password-rules">
-                <p><strong>Recomendaciones de seguridad:</strong></p>
-                <ul>
-                    <li>Mínimo 6 caracteres</li>
-                    <li>Combina letras y números</li>
-                    <li>Evita información personal obvia</li>
-                    <li>Anota la nueva contraseña en un lugar seguro</li>
-                </ul>
-            </div>
-            <button onclick="cambiarPassword()" class="btn-admin btn-password">
-                <i class="fas fa-sync-alt"></i> Cambiar Contraseña
-            </button>
-        </div>
-        
-        <div id="credentialMessage" style="margin-top: 20px; display: none;"></div>
-        
-        <!-- Sección 3: Credenciales Actuales -->
-        <div class="current-credentials">
-            <h3><i class="fas fa-info-circle"></i> Credenciales Actuales</h3>
-            <div class="credentials-display">
-                <div class="credential-item">
-                    <span class="credential-label">Nombre de Usuario:</span>
-                    <span class="credential-value" id="currentUsernameDisplay">admin</span>
-                </div>
-                <div class="credential-item">
-                    <span class="credential-label">Contraseña:</span>
-                    <span class="credential-value">••••••••</span>
-                </div>
-                <p class="credential-note">Estas credenciales son necesarias para acceder al panel administrativo.</p>
-               </div>
-              </div>
-                </div>
-             </div>
-
             </div>
         </div>
     </div>
 
     <script src="/js/admin.js"></script>
-    
+    <script>
+        // Inicialización básica
+        document.addEventListener('DOMContentLoaded', function() {
+            // Navegación por tabs
+            const tabs = document.querySelectorAll('.nav-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(c => c.classList.remove('active'));
+                    
+                    tab.classList.add('active');
+                    const targetId = tab.getAttribute('data-tab');
+                    document.getElementById(targetId).classList.add('active');
+                });
+            });
+            
+            // Botón de logout
+            document.getElementById('logoutBtn').addEventListener('click', function() {
+                localStorage.removeItem('adminToken');
+                location.reload();
+            });
+            
+            // Verificar si ya hay sesión
+            const token = localStorage.getItem('adminToken');
+            if (token) {
+                verificarSesion();
+            }
+        });
+        
+        // Función para mostrar mensajes
+        function mostrarMensaje(texto, tipo) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = texto;
+            messageDiv.className = 'message-' + tipo;
+            messageDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Función para verificar sesión
+        async function verificarSesion() {
+            const token = localStorage.getItem('adminToken');
+            if (!token) return;
+            
+            try {
+                const response = await fetch('/api/admin/verify', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    document.getElementById('loginPanel').style.display = 'none';
+                    document.getElementById('adminPanel').style.display = 'flex';
+                    
+                    const data = await response.json();
+                    document.getElementById('currentUsernameDisplay').textContent = data.admin.username;
+                    
+                    // Cargar datos
+                    cargarHistoria();
+                    cargarAlmuerzos();
+                    cargarReservas();
+                } else {
+                    localStorage.removeItem('adminToken');
+                }
+            } catch (error) {
+                console.error('Error verificando sesión:', error);
+                localStorage.removeItem('adminToken');
+            }
+        }
+        
+        // Login
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const loginMessage = document.getElementById('loginMessage');
+            
+            if (!username || !password) {
+                loginMessage.textContent = 'Por favor completa todos los campos';
+                loginMessage.style.display = 'block';
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/admin/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    localStorage.setItem('adminToken', data.token);
+                    document.getElementById('loginPanel').style.display = 'none';
+                    document.getElementById('adminPanel').style.display = 'flex';
+                    
+                    document.getElementById('currentUsernameDisplay').textContent = data.admin.username;
+                    
+                    // Cargar datos
+                    cargarHistoria();
+                    cargarAlmuerzos();
+                    cargarReservas();
+                } else {
+                    loginMessage.textContent = data.error || 'Credenciales incorrectas';
+                    loginMessage.style.display = 'block';
+                }
+            } catch (error) {
+                loginMessage.textContent = 'Error de conexión con el servidor';
+                loginMessage.style.display = 'block';
+                console.error('Error en login:', error);
+            }
+        });
+        
+        // Funciones de Historia
+        async function cargarHistoria() {
+            try {
+                const response = await fetch('/api/historia');
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('textoHistoria').value = data.texto || '';
+                }
+            } catch (error) {
+                console.error('Error cargando historia:', error);
+            }
+        }
+        
+        async function guardarHistoria() {
+            const texto = document.getElementById('textoHistoria').value;
+            const token = localStorage.getItem('adminToken');
+            
+            if (!texto.trim()) {
+                mostrarMensaje('Por favor escribe la historia', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/historia', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ texto })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    mostrarMensaje('Historia actualizada correctamente', 'success');
+                } else {
+                    mostrarMensaje(data.error || 'Error al guardar', 'error');
+                }
+            } catch (error) {
+                mostrarMensaje('Error de conexión', 'error');
+                console.error('Error guardando historia:', error);
+            }
+        }
+        
+        // Funciones de PDF
+        function manejarSeleccionPDF() {
+            const input = document.getElementById('pdfInput');
+            if (input.files.length > 0) {
+                document.getElementById('pdfFileInfo').style.display = 'block';
+                document.getElementById('pdfFileName').textContent = input.files[0].name;
+            }
+        }
+        
+        async function subirPDF() {
+            const input = document.getElementById('pdfInput');
+            const token = localStorage.getItem('adminToken');
+            
+            if (!input.files[0]) {
+                mostrarMensaje('Por favor selecciona un archivo PDF', 'error');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('pdf', input.files[0]);
+            
+            try {
+                const response = await fetch('/api/menu/pdf', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    mostrarMensaje('PDF actualizado correctamente', 'success');
+                    input.value = '';
+                    document.getElementById('pdfFileInfo').style.display = 'none';
+                } else {
+                    mostrarMensaje(data.error || 'Error al subir PDF', 'error');
+                }
+            } catch (error) {
+                mostrarMensaje('Error subiendo archivo', 'error');
+                console.error('Error subiendo PDF:', error);
+            }
+        }
+        
+        // Funciones de Almuerzos
+        async function cargarAlmuerzos() {
+            try {
+                const response = await fetch('/api/almuerzos');
+                if (response.ok) {
+                    const almuerzos = await response.json();
+                    renderAlmuerzos(almuerzos);
+                }
+            } catch (error) {
+                console.error('Error cargando almuerzos:', error);
+            }
+        }
+        
+        function renderAlmuerzos(almuerzos) {
+            const container = document.getElementById('listaAlmuerzos');
+            
+            if (!almuerzos || almuerzos.length === 0) {
+                container.innerHTML = '<div class="lunch-item" style="justify-content:center;color:#999;">No hay opciones disponibles</div>';
+                return;
+            }
+            
+            container.innerHTML = almuerzos.map(item => `
+                <div class="lunch-item">
+                    <div>
+                        <strong>${item.nombre || item.name}</strong>
+                        <span style="color:#666; font-size:0.9em;"> - $${(item.precio || item.price || 0).toLocaleString()}</span>
+                        <span style="color:#888; font-size:0.8em; margin-left:10px;">(${item.categoria})</span>
+                    </div>
+                    <button class="btn-delete" onclick="eliminarAlmuerzo('${item._id || item.id}')">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+        
+        async function agregarAlmuerzo() {
+            const nombre = document.getElementById('nuevoAlmuerzoNombre').value.trim();
+            const precio = parseFloat(document.getElementById('nuevoAlmuerzoPrecio').value) || 0;
+            const categoria = document.getElementById('nuevoAlmuerzoCategoria').value;
+            const token = localStorage.getItem('adminToken');
+            
+            if (!nombre) {
+                mostrarMensaje('Ingresa un nombre para el ítem', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/almuerzos', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ 
+                        nombre, 
+                        precio,
+                        categoria
+                    })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    mostrarMensaje('Ítem agregado correctamente', 'success');
+                    document.getElementById('nuevoAlmuerzoNombre').value = '';
+                    document.getElementById('nuevoAlmuerzoPrecio').value = '';
+                    cargarAlmuerzos();
+                } else {
+                    mostrarMensaje(data.error || 'Error al agregar', 'error');
+                }
+            } catch (error) {
+                mostrarMensaje('Error de conexión', 'error');
+                console.error('Error agregando ítem:', error);
+            }
+        }
+        
+        async function eliminarAlmuerzo(id) {
+            if (!confirm('¿Estás seguro de eliminar este ítem?')) return;
+            
+            const token = localStorage.getItem('adminToken');
+            
+            try {
+                const response = await fetch(`/api/almuerzos/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    mostrarMensaje('Ítem eliminado correctamente', 'success');
+                    cargarAlmuerzos();
+                } else {
+                    mostrarMensaje(data.error || 'Error al eliminar', 'error');
+                }
+            } catch (error) {
+                mostrarMensaje('Error de conexión', 'error');
+                console.error('Error eliminando ítem:', error);
+            }
+        }
+        
+        // Funciones de Reservas
+        async function cargarReservas() {
+            try {
+                const response = await fetch('/api/reservas');
+                if (response.ok) {
+                    const config = await response.json();
+                    document.getElementById('politicaCancelacion').value = config.politicaCancelacion || '';
+                    document.getElementById('politicaModificacion').value = config.politicaModificacion || '';
+                    document.getElementById('politicaAbono').value = config.politicaAbono || '';
+                    document.getElementById('bancoNombre').value = config.bancoNombre || '';
+                    document.getElementById('cuentaTipo').value = config.cuentaTipo || '';
+                    document.getElementById('cuentaNumero').value = config.cuentaNumero || '';
+                    document.getElementById('cuentaNombre').value = config.cuentaNombre || '';
+                    document.getElementById('nequiNumero').value = config.nequiNumero || '';
+                }
+            } catch (error) {
+                console.error('Error cargando reservas:', error);
+            }
+        }
+        
+        async function guardarReservas() {
+            const token = localStorage.getItem('adminToken');
+            
+            const config = {
+                politicaCancelacion: document.getElementById('politicaCancelacion').value,
+                politicaModificacion: document.getElementById('politicaModificacion').value,
+                politicaAbono: document.getElementById('politicaAbono').value,
+                bancoNombre: document.getElementById('bancoNombre').value,
+                cuentaTipo: document.getElementById('cuentaTipo').value,
+                cuentaNumero: document.getElementById('cuentaNumero').value,
+                cuentaNombre: document.getElementById('cuentaNombre').value,
+                nequiNumero: document.getElementById('nequiNumero').value
+            };
+            
+            try {
+                const response = await fetch('/api/reservas', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(config)
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    mostrarMensaje('Configuración de reservas guardada', 'success');
+                } else {
+                    mostrarMensaje(data.error || 'Error al guardar', 'error');
+                }
+            } catch (error) {
+                mostrarMensaje('Error de conexión', 'error');
+                console.error('Error guardando reservas:', error);
+            }
+        }
+        
+        // Funciones de Credenciales
+        async function cambiarUsername() {
+            const currentPassword = document.getElementById('currentPasswordForUsername').value;
+            const newUsername = document.getElementById('newUsername').value.trim();
+            const token = localStorage.getItem('adminToken');
+            
+            if (!currentPassword || !newUsername) {
+                mostrarMensaje('Completa todos los campos', 'error');
+                return;
+            }
+            
+            if (newUsername.length < 3) {
+                mostrarMensaje('El usuario debe tener al menos 3 caracteres', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/admin/username', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ currentPassword, newUsername })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    mostrarMensaje('Usuario actualizado correctamente', 'success');
+                    document.getElementById('currentUsernameDisplay').textContent = newUsername;
+                    localStorage.setItem('adminToken', data.token);
+                    document.getElementById('currentPasswordForUsername').value = '';
+                    document.getElementById('newUsername').value = '';
+                } else {
+                    mostrarMensaje(data.error || 'Error al actualizar', 'error');
+                }
+            } catch (error) {
+                mostrarMensaje('Error de conexión', 'error');
+                console.error('Error cambiando username:', error);
+            }
+        }
+        
+        async function cambiarPassword() {
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const token = localStorage.getItem('adminToken');
+            
+            if (!currentPassword || !newPassword || !confirmPassword) {
+                mostrarMensaje('Completa todos los campos', 'error');
+                return;
+            }
+            
+            if (newPassword !== confirmPassword) {
+                mostrarMensaje('Las contraseñas no coinciden', 'error');
+                return;
+            }
+            
+            if (newPassword.length < 6) {
+                mostrarMensaje('La contraseña debe tener al menos 6 caracteres', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/admin/password', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ currentPassword, newPassword })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    mostrarMensaje('Contraseña actualizada correctamente', 'success');
+                    document.getElementById('currentPassword').value = '';
+                    document.getElementById('newPassword').value = '';
+                    document.getElementById('confirmPassword').value = '';
+                } else {
+                    mostrarMensaje(data.error || 'Error al actualizar', 'error');
+                }
+            } catch (error) {
+                mostrarMensaje('Error de conexión', 'error');
+                console.error('Error cambiando password:', error);
+            }
+        }
+        
+        // Hacer funciones disponibles globalmente
+        window.guardarHistoria = guardarHistoria;
+        window.manejarSeleccionPDF = manejarSeleccionPDF;
+        window.subirPDF = subirPDF;
+        window.agregarAlmuerzo = agregarAlmuerzo;
+        window.eliminarAlmuerzo = eliminarAlmuerzo;
+        window.guardarReservas = guardarReservas;
+        window.cambiarUsername = cambiarUsername;
+        window.cambiarPassword = cambiarPassword;
+    </script>
 </body>
 </html>

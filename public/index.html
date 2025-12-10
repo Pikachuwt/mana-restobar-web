@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Estilos para el PDF - SOLUCIÓN SIMPLE */
+        /* Estilos para el PDF */
         .pdf-container {
             width: 100%;
             max-width: 900px;
@@ -26,7 +26,7 @@
             border: none;
         }
         
-        /* Responsive */
+        /* Responsive para PDF */
         @media (max-width: 768px) {
             .pdf-viewer {
                 height: 500px;
@@ -37,33 +37,6 @@
             .pdf-viewer {
                 height: 400px;
             }
-        }
-        
-        /* Estilos adicionales */
-        body {
-            background-color: #f8f8f8;
-            color: #333;
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
-            font-family: 'Open Sans', sans-serif;
-        }
-        
-        .section {
-            display: none;
-            padding: 40px 0;
-            background: white;
-            min-height: 80vh;
-        }
-        
-        .section.active {
-            display: block;
-            animation: fadeIn 0.5s ease-in;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
         }
         
         /* Estilos para notificaciones */
@@ -121,10 +94,10 @@
             </div>
             <nav class="nav">
                 <ul>
-                    <li><a href="#inicio" class="nav-link active" data-target="inicio-section">Inicio</a></li>
-                    <li><a href="#menu" class="nav-link" data-target="menu-section">Menú</a></li>
-                    <li><a href="#arma-almuerzo" class="nav-link" data-target="arma-almuerzo-section">Arma tu Almuerzo</a></li>
-                    <li><a href="#reservas" class="nav-link" data-target="reservas-section">Reservas</a></li>
+                    <li><a href="#" class="nav-link active" onclick="showSection('inicio-section'); return false;">Inicio</a></li>
+                    <li><a href="#" class="nav-link" onclick="showSection('menu-section'); return false;">Menú</a></li>
+                    <li><a href="#" class="nav-link" onclick="showSection('arma-almuerzo-section'); return false;">Arma tu Almuerzo</a></li>
+                    <li><a href="#" class="nav-link" onclick="showSection('reservas-section'); return false;">Reservas</a></li>
                 </ul>
             </nav>
             <div class="social-icons">
@@ -147,8 +120,8 @@
                     <h1>Bienvenido a Maná Restobar</h1>
                     <p>El corazón de Pamplona donde cada taza de café y cada plato se sirve con amor familiar.</p>
                     <div class="hero-buttons">
-                        <a href="#menu" class="btn nav-section-btn" data-target="menu-section">Ver Menú</a>
-                        <a href="#reservas" class="btn btn-secondary nav-section-btn" data-target="reservas-section">Reservar Mesa</a>
+                        <a href="#" class="btn" onclick="showSection('menu-section'); return false;">Ver Menú</a>
+                        <a href="#" class="btn btn-secondary" onclick="showSection('reservas-section'); return false;">Reservar Mesa</a>
                     </div>
                 </div>
             </div>
@@ -158,7 +131,6 @@
                 <div class="historia-section">
                     <h2>Nuestra Historia</h2>
                     <div class="historia-content" id="historia-dinamica">
-                        <!-- La historia se cargará aquí dinámicamente desde la API -->
                         <p>Cargando historia...</p>
                     </div>
                 </div>
@@ -192,12 +164,12 @@
             </div>
         </section>
 
-        <!-- Sección MENÚ - VERSIÓN CORREGIDA Y FUNCIONAL -->
+        <!-- Sección MENÚ -->
         <section id="menu-section" class="section">
             <div class="container">
                 <h2 class="section-title">Nuestro Menú</h2>
                 
-                <!-- Contenedor del PDF - SOLUCIÓN SIMPLE -->
+                <!-- Contenedor del PDF -->
                 <div class="pdf-container">
                     <iframe 
                         src="images/menu-actual.pdf" 
@@ -214,18 +186,6 @@
                     </iframe>
                 </div>
                 
-                <!-- Mensaje alternativo por si el PDF no carga -->
-                <div id="pdf-message" style="text-align: center; margin-top: 20px; display: none;">
-                    <p style="color: #666; margin-bottom: 10px;">
-                        <i class="fas fa-info-circle"></i> Si no ves el menú, intenta:
-                    </p>
-                    <a href="images/menu-actual.pdf" target="_blank" 
-                       style="background: #d4af37; color: white; padding: 10px 20px; 
-                              border-radius: 5px; text-decoration: none; display: inline-block;">
-                        <i class="fas fa-external-link-alt"></i> Abrir en nueva pestaña
-                    </a>
-                </div>
-
                 <div class="menu-types">
                     <div class="menu-type-card">
                         <h3>Menú Ejecutivo</h3>
@@ -249,8 +209,7 @@
                 <div class="build-lunch-container-new">
                     <!-- Parte izquierda - Opciones -->
                     <div class="options-side">
-                        <div class="options-grid-simple" id="almuerzos-options">
-                            <!-- Las opciones se mantienen igual que antes -->
+                        <div class="options-grid-simple">
                             <div class="option-card" data-name="Arroz" data-price="4000">
                                 <div class="option-icon">🍚</div>
                                 <div class="option-details">
@@ -564,8 +523,396 @@
     <!-- Contenedor para notificaciones -->
     <div id="notification-container" class="notification-container"></div>
 
-    <!-- JavaScript -->
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="/js/main.js"></script>
+    <!-- JavaScript SIMPLE Y FUNCIONAL -->
+    <script>
+    // =======================================================
+    // FUNCIONES BÁSICAS DE NAVEGACIÓN
+    // =======================================================
+    
+    // Función para mostrar una sección específica
+    function showSection(sectionId) {
+        console.log('Mostrando sección:', sectionId);
+        
+        // Ocultar todas las secciones
+        document.querySelectorAll('.section').forEach(section => {
+            section.classList.remove('active');
+        });
+        
+        // Mostrar la sección solicitada
+        const targetSection = document.getElementById(sectionId);
+        if (targetSection) {
+            targetSection.classList.add('active');
+            
+            // Actualizar navegación activa
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            // Encontrar y activar el enlace correspondiente
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                if (link.textContent.includes('Inicio') && sectionId === 'inicio-section') {
+                    link.classList.add('active');
+                } else if (link.textContent.includes('Menú') && sectionId === 'menu-section') {
+                    link.classList.add('active');
+                } else if (link.textContent.includes('Almuerzo') && sectionId === 'arma-almuerzo-section') {
+                    link.classList.add('active');
+                } else if (link.textContent.includes('Reservas') && sectionId === 'reservas-section') {
+                    link.classList.add('active');
+                }
+            });
+            
+            // Scroll suave a la sección
+            window.scrollTo({
+                top: targetSection.offsetTop - 100,
+                behavior: 'smooth'
+            });
+            
+            // Cargar contenido específico si es necesario
+            if (sectionId === 'inicio-section') {
+                cargarHistoria();
+            }
+        }
+    }
+    
+    // =======================================================
+    // CARGA DE HISTORIA
+    // =======================================================
+    async function cargarHistoria() {
+        const historiaDiv = document.getElementById('historia-dinamica');
+        if (!historiaDiv) return;
+        
+        try {
+            const response = await fetch('/api/historia');
+            
+            if (response.ok) {
+                const data = await response.json();
+                
+                if (data && data.texto) {
+                    historiaDiv.innerHTML = `
+                        <div class="historia-text">
+                            ${data.texto.replace(/\n/g, '<br>')}
+                        </div>
+                    `;
+                } else {
+                    mostrarHistoriaPorDefecto();
+                }
+            } else {
+                mostrarHistoriaPorDefecto();
+            }
+        } catch (error) {
+            console.error('Error cargando historia:', error);
+            mostrarHistoriaPorDefecto();
+        }
+    }
+    
+    function mostrarHistoriaPorDefecto() {
+        const historiaDiv = document.getElementById('historia-dinamica');
+        if (!historiaDiv) return;
+        
+        historiaDiv.innerHTML = `
+            <div class="historia-text">
+                <p>Bienvenidos a <strong>Maná Restobar</strong>, el corazón gastronómico de Pamplona, Norte de Santander.</p>
+                <p>Fundado en el año 2010, nuestro restaurante familiar nació con el sueño de ofrecer a nuestros clientes una experiencia culinaria única, donde la tradición se encuentra con la innovación.</p>
+                <p>Ubicados estratégicamente frente al Hospital San Juan de Dios, nos hemos convertido en el lugar preferido tanto para los habitantes de Pamplona como para los visitantes que buscan sabores auténticos en un ambiente acogedor y familiar.</p>
+                <p>Nuestro nombre "Maná" hace referencia al alimento divino que según la tradición alimentaba a los pueblos en sus viajes. Para nosotros, cada plato que servimos es una bendición que compartimos con nuestra comunidad.</p>
+                <p>Nos especializamos en comida típica colombiana con un toque gourmet, utilizando ingredientes frescos y de la más alta calidad, muchos de ellos provenientes de productores locales de Norte de Santander.</p>
+                <p>En Maná Restobar, creemos que una buena comida va más allá de alimentar el cuerpo; alimenta el alma, crea momentos memorables y fortalece los lazos entre las personas.</p>
+                <p>¡Te invitamos a ser parte de nuestra historia y a disfrutar de la cálida hospitalidad que nos caracteriza!</p>
+            </div>
+        `;
+    }
+    
+    // =======================================================
+    // SISTEMA "ARMA TU ALMUERZO"
+    // =======================================================
+    function initAlmuerzo() {
+        const optionCards = document.querySelectorAll('.option-card');
+        const selectedItemsContainer = document.getElementById('selectedItems');
+        const totalAmountElement = document.getElementById('totalAmount');
+        const sendOrderBtn = document.getElementById('sendOrderBtn');
+        const paraLlevarCheckbox = document.getElementById('paraLlevar');
+        
+        let selectedItems = [];
+        let total = 0;
+        
+        // Función para actualizar el resumen
+        function updateSummary() {
+            // Calcular total
+            total = selectedItems.reduce((sum, item) => sum + item.price, 0);
+            
+            // Añadir costo para llevar si está marcado
+            if (paraLlevarCheckbox && paraLlevarCheckbox.checked) {
+                total += 1000;
+            }
+            
+            // Actualizar el total en la UI
+            if (totalAmountElement) {
+                totalAmountElement.textContent = `$${total.toLocaleString()}`;
+            }
+            
+            // Actualizar la lista de ítems seleccionados
+            if (selectedItems.length === 0) {
+                selectedItemsContainer.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📝</div>
+                        <p class="empty-text">Selecciona los ítems de tu almuerzo</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let itemsHTML = '';
+            selectedItems.forEach((item, index) => {
+                itemsHTML += `
+                    <div class="selected-item-card">
+                        <span class="selected-item-name">${item.name}</span>
+                        <span class="selected-item-price">$${item.price.toLocaleString()}</span>
+                        <button class="remove-item-btn" data-index="${index}" style="
+                            background: none;
+                            border: none;
+                            color: #e74c3c;
+                            cursor: pointer;
+                            font-size: 16px;
+                            margin-left: 10px;
+                        ">✕</button>
+                    </div>
+                `;
+            });
+            
+            selectedItemsContainer.innerHTML = itemsHTML;
+            
+            // Añadir event listeners a los botones de eliminar
+            document.querySelectorAll('.remove-item-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const index = parseInt(this.getAttribute('data-index'));
+                    removeItem(index);
+                });
+            });
+        }
+        
+        // Función para añadir un ítem
+        function addItem(name, price) {
+            selectedItems.push({ name, price });
+            updateSummary();
+            showNotification(`${name} agregado al pedido`, 'success');
+        }
+        
+        // Función para eliminar un ítem
+        function removeItem(index) {
+            const removedItem = selectedItems.splice(index, 1)[0];
+            updateSummary();
+            showNotification(`${removedItem.name} eliminado del pedido`, 'info');
+        }
+        
+        // Eventos para las tarjetas de opciones
+        optionCards.forEach(card => {
+            card.addEventListener('click', function() {
+                const name = this.getAttribute('data-name');
+                const price = parseInt(this.getAttribute('data-price'));
+                
+                // Efecto visual de selección
+                this.classList.add('selected');
+                setTimeout(() => {
+                    this.classList.remove('selected');
+                }, 300);
+                
+                // Añadir el ítem
+                addItem(name, price);
+            });
+        });
+        
+        // Evento para el checkbox de "para llevar"
+        if (paraLlevarCheckbox) {
+            paraLlevarCheckbox.addEventListener('change', updateSummary);
+        }
+        
+        // Evento para el botón de enviar por WhatsApp
+        if (sendOrderBtn) {
+            sendOrderBtn.addEventListener('click', function() {
+                if (selectedItems.length === 0) {
+                    showNotification('Por favor, selecciona al menos un ítem para tu almuerzo.', 'error');
+                    return;
+                }
+                
+                let message = `*PEDIDO - MANÁ RESTOBAR*%0A%0A`;
+                message += `*Fecha:* ${new Date().toLocaleDateString()}%0A`;
+                message += `*Hora:* ${new Date().toLocaleTimeString()}%0A%0A`;
+                message += `*Detalle del pedido:*%0A`;
+                
+                selectedItems.forEach(item => {
+                    message += `• ${item.name} - $${item.price.toLocaleString()}%0A`;
+                });
+                
+                if (paraLlevarCheckbox && paraLlevarCheckbox.checked) {
+                    message += `• Para llevar - $1.000%0A`;
+                }
+                
+                message += `%0A*Total: $${total.toLocaleString()}*%0A%0A`;
+                message += `_Por favor, confirmar disponibilidad y tiempo de preparación._`;
+                
+                const phone = '573150118386';
+                const whatsappURL = `https://wa.me/${phone}?text=${message}`;
+                window.open(whatsappURL, '_blank');
+                
+                showNotification('Redirigiendo a WhatsApp...', 'info');
+                
+                // Limpiar pedido después de enviar
+                setTimeout(() => {
+                    selectedItems = [];
+                    if (paraLlevarCheckbox) paraLlevarCheckbox.checked = false;
+                    updateSummary();
+                }, 2000);
+            });
+        }
+    }
+    
+    // =======================================================
+    // SISTEMA DE RESERVAS
+    // =======================================================
+    function initReservas() {
+        const reservaForm = document.getElementById('reservaForm');
+        if (!reservaForm) return;
+        
+        // Establecer la fecha mínima como hoy
+        const fechaInput = document.getElementById('fecha');
+        if (fechaInput) {
+            const today = new Date().toISOString().split('T')[0];
+            fechaInput.min = today;
+            fechaInput.value = today;
+        }
+        
+        // Establecer hora por defecto (12:00 PM)
+        const horaInput = document.getElementById('hora');
+        if (horaInput) {
+            horaInput.value = '12:00';
+        }
+        
+        // Evento para enviar el formulario
+        reservaForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Obtener los valores del formulario
+            const personas = document.getElementById('personas').value;
+            const hora = document.getElementById('hora').value;
+            const fecha = document.getElementById('fecha').value;
+            const plato = document.getElementById('plato').value;
+            const observaciones = document.getElementById('observaciones').value;
+            
+            // Validar que los campos obligatorios estén llenos
+            if (!personas || !hora || !fecha) {
+                showNotification('Por favor, complete los campos obligatorios: Número de personas, Hora y Fecha.', 'error');
+                return;
+            }
+            
+            // Formatear la fecha
+            const fechaObj = new Date(fecha);
+            const fechaFormateada = fechaObj.toLocaleDateString('es-ES', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            // Crear el mensaje para WhatsApp
+            let message = `*RESERVA - MANÁ RESTOBAR*%0A%0A`;
+            message += `*Número de personas:* ${personas}%0A`;
+            message += `*Fecha:* ${fechaFormateada}%0A`;
+            message += `*Hora:* ${hora}%0A`;
+            
+            if (plato) {
+                message += `*Plato solicitado:* ${plato}%0A`;
+            }
+            
+            if (observaciones) {
+                message += `*Observaciones:* ${observaciones}%0A`;
+            }
+            
+            message += `%0A_Por favor, confirmar disponibilidad._`;
+            
+            const phone = '573150118386';
+            const whatsappURL = `https://wa.me/${phone}?text=${message}`;
+            window.open(whatsappURL, '_blank');
+            
+            showNotification('Redirigiendo a WhatsApp para confirmar reserva...', 'success');
+            
+            // Limpiar formulario después de enviar
+            setTimeout(() => {
+                reservaForm.reset();
+                if (fechaInput) {
+                    const today = new Date().toISOString().split('T')[0];
+                    fechaInput.value = today;
+                }
+                if (horaInput) horaInput.value = '12:00';
+            }, 1000);
+        });
+    }
+    
+    // =======================================================
+    // NOTIFICACIONES
+    // =======================================================
+    function showNotification(message, type = 'info') {
+        const container = document.getElementById('notification-container');
+        if (!container) return;
+        
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.innerHTML = `
+            <div class="notification-content">
+                <i class="${getNotificationIcon(type)}"></i>
+                <span>${message}</span>
+            </div>
+            <button onclick="this.parentElement.remove()" style="
+                background: none;
+                border: none;
+                font-size: 20px;
+                cursor: pointer;
+                color: #666;
+            ">&times;</button>
+        `;
+        
+        container.appendChild(notification);
+        
+        // Auto-remove después de 5 segundos
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.remove();
+            }
+        }, 5000);
+    }
+    
+    function getNotificationIcon(type) {
+        switch(type) {
+            case 'success': return 'fas fa-check-circle';
+            case 'error': return 'fas fa-exclamation-circle';
+            case 'warning': return 'fas fa-exclamation-triangle';
+            case 'info': return 'fas fa-info-circle';
+            default: return 'fas fa-bell';
+        }
+    }
+    
+    // =======================================================
+    // INICIALIZACIÓN CUANDO EL DOCUMENTO ESTÁ LISTO
+    // =======================================================
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('🚀 Maná Restobar iniciando...');
+        
+        // Cargar historia inicial
+        cargarHistoria();
+        
+        // Inicializar funcionalidades
+        initAlmuerzo();
+        initReservas();
+        
+        console.log('✅ Aplicación inicializada correctamente');
+    });
+    
+    // =======================================================
+    // FUNCIONES GLOBALES
+    // =======================================================
+    window.showSection = showSection;
+    window.cargarHistoria = cargarHistoria;
+    window.showNotification = showNotification;
+    </script>
 </body>
 </html>

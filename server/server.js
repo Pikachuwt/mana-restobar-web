@@ -39,6 +39,7 @@ app.use(fileUpload({
 app.use(express.static(path.join(__dirname, '../public')));
 
 // Middleware de autenticación
+// Middleware de autenticación SIMPLIFICADO
 const authMiddleware = (req, res, next) => {
     const token = req.headers.authorization?.replace('Bearer ', '');
     
@@ -46,13 +47,14 @@ const authMiddleware = (req, res, next) => {
         return res.status(401).json({ error: 'Acceso no autorizado. Token requerido.' });
     }
     
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = decoded;
-        next();
-    } catch (error) {
-        return res.status(401).json({ error: 'Token inválido o expirado.' });
+    // Verificación simple del token
+    if (!token.startsWith('dummy-token-')) {
+        return res.status(401).json({ error: 'Token inválido.' });
     }
+    
+    // Simular usuario autenticado
+    req.user = { username: 'admin', role: 'admin' };
+    next();
 };
 
 // Conexión a MongoDB
@@ -406,16 +408,14 @@ app.post('/api/admin/login', async (req, res) => {
             return res.status(400).json({ error: 'Usuario y contraseña requeridos' });
         }
         
-        // Buscar admin
         const admin = await Admin.findOne({ username });
         
         if (!admin) {
             return res.status(401).json({ error: 'Credenciales incorrectas' });
         }
         
-        // Verificar contraseña
-        const isValidPassword = await bcrypt.compare(password, admin.password);
-        if (!isValidPassword) {
+        // COMPARACIÓN SIMPLE (sin bcrypt)
+        if (admin.password !== password) {
             return res.status(401).json({ error: 'Credenciales incorrectas' });
         }
         
@@ -423,16 +423,8 @@ app.post('/api/admin/login', async (req, res) => {
         admin.lastLogin = new Date();
         await admin.save();
         
-        // Generar token JWT
-        const token = jwt.sign(
-            { 
-                id: admin._id, 
-                username: admin.username, 
-                role: admin.role 
-            },
-            process.env.JWT_SECRET,
-            { expiresIn: '24h' }
-        );
+        // Generar token simple (sin JWT por ahora)
+        const token = 'dummy-token-' + Date.now();
         
         res.json({ 
             success: true, 
@@ -557,26 +549,28 @@ app.put('/api/admin/password', authMiddleware, async (req, res) => {
 });
 
 // 6. CREAR ADMIN POR DEFECTO
+// Crear admin por defecto si no existe
 async function createDefaultAdmin() {
     try {
+        const Admin = require('./models/Admin');
         const adminExists = await Admin.findOne({ username: 'admin' });
         
         if (!adminExists) {
-            const salt = await bcrypt.genSalt(10);
-            const hashedPassword = await bcrypt.hash('admin123', salt);
-            
+            // ADMIN SIN BCRYPT (solo para desarrollo)
             const admin = new Admin({
                 username: 'admin',
-                password: hashedPassword,
+                password: 'admin123', // Contraseña en texto plano
                 email: 'admin@manarestobar.com',
                 role: 'admin'
             });
             
+            // Guardar sin encriptar (temporal)
             await admin.save();
-            console.log('✅ Admin por defecto creado');
+            
+            console.log('✅ Admin por defecto creado (SIN ENCRIPTACIÓN)');
             console.log('👤 Usuario: admin');
             console.log('🔐 Contraseña: admin123');
-            console.log('⚠️ ¡Cambia la contraseña después del primer login!');
+            console.log('⚠️ ¡Solo para desarrollo!');
         } else {
             console.log('✅ Admin ya existe en la base de datos');
         }
