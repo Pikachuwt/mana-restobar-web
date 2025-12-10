@@ -1,409 +1,635 @@
-// server/server.js - VERSIÓN OPTIMIZADA Y ROBUSTA
+// server/server.js - Servidor principal actualizado
 const express = require('express');
-const cors = require('cors');
-const bodyParser = require('body-parser');
-const multer = require('multer');
+const http = require('http');
+const socketIo = require('socket.io');
+const mongoose = require('mongoose');
 const path = require('path');
-const fs = require('fs');
+const cors = require('cors');
+const fileUpload = require('express-fileupload');
+const fs = require('fs').promises;
+const fsSync = require('fs');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
-// Importar funciones del admin
-const adminFunctions = require('./admin-functions');
-
+// Configuración
 const app = express();
+const server = http.createServer(app);
+const io = socketIo(server, {
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST", "PUT", "DELETE"]
+    }
+});
+
 const PORT = process.env.PORT || 3000;
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/mana-restobar';
 
-// ===== CONFIGURACIONES =====
-
-// 1. Crear carpeta de imágenes si no existe
-const imagesDir = path.join(__dirname, '../public/images');
-if (!fs.existsSync(imagesDir)) {
-    fs.mkdirSync(imagesDir, { recursive: true });
-    console.log('✅ Carpeta images creada');
-}
-
-// 2. Middleware
+// Middleware
 app.use(cors());
-app.use(bodyParser.json());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(fileUpload({
+    createParentPath: true,
+    limits: { fileSize: 10 * 1024 * 1024 }, // 10MB máximo
+    useTempFiles: false
+}));
+
+// Servir archivos estáticos
 app.use(express.static(path.join(__dirname, '../public')));
 
-// 3. Configuración de subida de archivos (PDF)
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, imagesDir);
-    },
-    filename: function (req, file, cb) {
-        // Mantener el nombre original del PDF para referencia
-        const originalName = file.originalname.replace(/\s+/g, '-');
-        cb(null, 'menu-actual.pdf'); // Siempre el mismo nombre para reemplazar
-    }
-});
-
-const upload = multer({ 
-    storage: storage,
-    limits: { fileSize: 10 * 1024 * 1024 }, // 10MB límite
-    fileFilter: (req, file, cb) => {
-        if (file.mimetype === 'application/pdf') {
-            cb(null, true);
-        } else {
-            cb(new Error('Solo se permiten archivos PDF'), false);
-        }
-    }
-});
-
-// ===== MIDDLEWARE DE LOGS =====
-app.use((req, res, next) => {
-    console.log(`[${new Date().toLocaleTimeString()}] ${req.method} ${req.url}`);
-    next();
-});
-
-// ===== RUTAS API =====
-
-// 1. OBTENER TODOS LOS DATOS
-app.get('/api/data', (req, res) => {
-    try {
-        const data = adminFunctions.obtenerTodosDatos();
-        res.json(data);
-    } catch (error) {
-        console.error('❌ Error en /api/data:', error.message);
-        res.status(500).json({ 
-            error: 'Error leyendo datos',
-            details: process.env.NODE_ENV === 'development' ? error.message : undefined
-        });
-    }
-});
-
-// 2. LOGIN SIMPLE
-// Busca la ruta de login (alrededor de línea 45-60)
-app.post('/api/auth/login', (req, res) => {
-    const { username, password } = req.body;
+// Middleware de autenticación
+const authMiddleware = (req, res, next) => {
+    const token = req.headers.authorization?.replace('Bearer ', '');
     
-    // Obtener credenciales actuales desde data.json
-    const data = adminFunctions.leerDatos();
-    const currentUsername = data.config?.username || 'admin';
-    const currentPassword = data.config?.password || 'Patoazul';
+    if (!token) {
+        return res.status(401).json({ error: 'Acceso no autorizado. Token requerido.' });
+    }
     
-    if (username === currentUsername && password === currentPassword) {
-        res.json({ 
-            success: true, 
-            token: 'token-falso-seguro-123', 
-            admin: { 
-                username: currentUsername,
-                lastLogin: new Date().toISOString()
-            } 
-        });
-    } else {
-        res.status(401).json({ 
-            success: false, 
-            error: 'Credenciales incorrectas' 
-        });
-    }
-});
-
-// Agrega esto después de la ruta de change-password
-app.post('/api/change-username', (req, res) => {
     try {
-        const { currentPassword, newUsername } = req.body;
-        
-        if (!currentPassword || !newUsername) {
-            return res.status(400).json({ 
-                success: false, 
-                error: 'La contraseña actual y el nuevo nombre de usuario son requeridos' 
-            });
-        }
-        
-        if (newUsername.length < 3) {
-            return res.status(400).json({ 
-                success: false, 
-                error: 'El nombre de usuario debe tener al menos 3 caracteres' 
-            });
-        }
-        
-        const result = adminFunctions.cambiarUsername(currentPassword, newUsername);
-        res.json(result);
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        req.user = decoded;
+        next();
     } catch (error) {
-        console.error('❌ Error en /api/change-username:', error);
+        return res.status(401).json({ error: 'Token inválido o expirado.' });
+    }
+};
+
+// Conexión a MongoDB
+mongoose.connect(MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+}).then(() => {
+    console.log('✅ Conectado a MongoDB');
+}).catch(err => {
+    console.error('❌ Error conectando a MongoDB:', err);
+    console.log('⚠️ Continuando sin MongoDB...');
+});
+
+// Importar modelos
+const Menu = require('./models/Menu');
+const AlmuerzoItem = require('./models/AlmuerzoItem');
+const Admin = require('./models/Admin');
+const ReservaConfig = require('./models/ReservaConfig');
+const Historia = require('./models/Historia');
+
+// Configurar directorios
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fsSync.existsSync(uploadsDir)) {
+    fsSync.mkdirSync(uploadsDir, { recursive: true });
+}
+
+// ============================
+// WEBSOCKETS
+// ============================
+io.on('connection', (socket) => {
+    console.log(`🔗 Cliente conectado: ${socket.id}`);
+    
+    socket.on('disconnect', () => {
+        console.log(`🔌 Cliente desconectado: ${socket.id}`);
+    });
+});
+
+// ============================
+// RUTAS API
+// ============================
+
+// 1. HISTORIA
+app.get('/api/historia', async (req, res) => {
+    try {
+        let historia = await Historia.findOne().sort({ updatedAt: -1 });
+        
+        if (!historia) {
+            // Historia por defecto
+            historia = new Historia({
+                texto: 'Bienvenidos a Maná Restobar, el lugar donde los sabores se encuentran con la tradición...',
+                updatedAt: new Date()
+            });
+            await historia.save();
+        }
+        
+        res.json({ texto: historia.texto, updatedAt: historia.updatedAt });
+    } catch (error) {
+        console.error('Error obteniendo historia:', error);
         res.status(500).json({ 
-            success: false, 
-            error: 'Error cambiando nombre de usuario' 
+            error: 'Error interno del servidor',
+            texto: 'Historia no disponible en este momento.'
         });
     }
 });
 
-// 3. GUARDAR HISTORIA
-app.post('/api/historia', (req, res) => {
+app.post('/api/historia', authMiddleware, async (req, res) => {
     try {
         const { texto } = req.body;
         
         if (!texto || texto.trim() === '') {
-            return res.status(400).json({ 
-                success: false, 
-                error: 'El texto de la historia es requerido' 
-            });
+            return res.status(400).json({ error: 'El texto de la historia es requerido' });
         }
         
-        const result = adminFunctions.guardarHistoria(texto.trim());
-        console.log('✅ Historia actualizada');
-        res.json(result);
-    } catch (error) {
-        console.error('❌ Error en /api/historia:', error);
-        res.status(500).json({ 
-            success: false, 
-            error: 'Error guardando historia' 
-        });
-    }
-});
-
-// 3.1 OBTENER HISTORIA (GET)
-app.get('/api/historia', (req, res) => {
-    try {
-        const data = adminFunctions.obtenerTodosDatos();
-        
-        // Devolver solo la historia
-        res.json({ 
-            success: true, 
-            texto: data.historia || '' 
-        });
-    } catch (error) {
-        console.error('❌ Error en GET /api/historia:', error);
-        res.status(500).json({ 
-            success: false, 
-            error: 'Error obteniendo historia' 
-        });
-    }
-});
-
-
-
-// 4. SUBIR PDF DEL MENÚ
-app.post('/api/menu/pdf', upload.single('pdf'), (req, res) => {
-    try {
-        if (!req.file) {
-            return res.status(400).json({ 
-                success: false, 
-                error: 'No se subió ningún archivo' 
-            });
-        }
-        
-        console.log(`✅ PDF subido: ${req.file.originalname} (${req.file.size} bytes)`);
-        
-        res.json({ 
-            success: true, 
-            url: '/images/menu-actual.pdf',
-            filename: req.file.originalname,
-            size: req.file.size,
-            message: 'Menú PDF actualizado correctamente'
-        });
-    } catch (error) {
-        console.error('❌ Error en /api/menu/pdf:', error.message);
-        
-        if (error instanceof multer.MulterError) {
-            if (error.code === 'LIMIT_FILE_SIZE') {
-                return res.status(400).json({ 
-                    success: false, 
-                    error: 'El archivo es muy grande. Máximo 10MB' 
-                });
+        const historia = await Historia.findOneAndUpdate(
+            {},
+            { 
+                texto: texto.trim(),
+                updatedAt: new Date()
+            },
+            { 
+                new: true, 
+                upsert: true,
+                setDefaultsOnInsert: true 
             }
-        }
+        );
         
-        res.status(500).json({ 
-            success: false, 
-            error: error.message || 'Error subiendo el archivo' 
+        // Emitir actualización por WebSocket
+        io.emit('historia_updated', { historia: historia.texto });
+        
+        res.json({ 
+            success: true, 
+            historia,
+            message: 'Historia actualizada correctamente'
         });
-    }
-});
-
-// 5. GESTIONAR ALMUERZOS
-app.post('/api/almuerzos', (req, res) => {
-    try {
-        const { nombre, precio } = req.body;
-        
-        if (!nombre || nombre.trim() === '') {
-            return res.status(400).json({ 
-                success: false, 
-                error: 'El nombre del almuerzo es requerido' 
-            });
-        }
-        
-        // Convertir precio a número o usar 0
-        const precioNum = precio ? parseInt(precio) || 0 : 0;
-        
-        const result = adminFunctions.agregarAlmuerzo(nombre.trim(), precioNum.toString());
-        console.log(`✅ Almuerzo agregado: ${nombre}`);
-        res.json(result);
     } catch (error) {
-        console.error('❌ Error en /api/almuerzos:', error);
+        console.error('Error actualizando historia:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+});
+
+// 2. MENÚ PDF
+app.get('/api/menu/current', async (req, res) => {
+    try {
+        // Ruta al PDF
+        const pdfPath = path.join(__dirname, '../public/images/menu-actual.pdf');
+        
+        if (!fsSync.existsSync(pdfPath)) {
+            return res.status(404).json({ error: 'Menú no disponible' });
+        }
+        
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+        
+        res.sendFile(pdfPath);
+    } catch (error) {
+        console.error('Error sirviendo PDF:', error);
+        res.status(500).json({ error: 'Error cargando el menú' });
+    }
+});
+
+app.post('/api/menu/pdf', authMiddleware, async (req, res) => {
+    try {
+        if (!req.files || !req.files.pdf) {
+            return res.status(400).json({ error: 'No se subió ningún archivo PDF' });
+        }
+        
+        const pdfFile = req.files.pdf;
+        
+        // Validar que sea PDF
+        if (!pdfFile.mimetype.includes('pdf')) {
+            return res.status(400).json({ error: 'El archivo debe ser un PDF' });
+        }
+        
+        // Validar tamaño (máximo 5MB)
+        if (pdfFile.size > 5 * 1024 * 1024) {
+            return res.status(400).json({ error: 'El PDF no debe superar los 5MB' });
+        }
+        
+        // Ruta donde se guardará
+        const pdfPath = path.join(__dirname, '../public/images/menu-actual.pdf');
+        
+        // Guardar archivo
+        await pdfFile.mv(pdfPath);
+        
+        // Actualizar base de datos
+        const menu = await Menu.findOneAndUpdate(
+            {},
+            { 
+                pdfUrl: '/images/menu-actual.pdf',
+                pdfName: 'menu-actual.pdf',
+                lastUpdated: new Date()
+            },
+            { 
+                new: true, 
+                upsert: true 
+            }
+        );
+        
+        // Emitir actualización por WebSocket
+        io.emit('menu_updated', { 
+            pdfUrl: '/api/menu/current',
+            timestamp: new Date()
+        });
+        
+        res.json({ 
+            success: true, 
+            menu,
+            message: 'Menú actualizado correctamente'
+        });
+        
+    } catch (error) {
+        console.error('Error subiendo PDF:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+});
+
+// 3. ALMUERZOS
+app.get('/api/almuerzos', async (req, res) => {
+    try {
+        const almuerzos = await AlmuerzoItem.find({ disponible: true })
+            .sort({ order: 1, categoria: 1 });
+        
+        if (!almuerzos || almuerzos.length === 0) {
+            // Datos de ejemplo si la base está vacía
+            return res.json([
+                { _id: '1', nombre: 'Arroz', precio: 4000, categoria: 'acompanamiento' },
+                { _id: '2', nombre: 'Papas a la Francesa', precio: 5200, categoria: 'acompanamiento' },
+                { _id: '3', nombre: 'Carnes', precio: 8900, categoria: 'proteina' }
+            ]);
+        }
+        
+        res.json(almuerzos);
+    } catch (error) {
+        console.error('Error obteniendo almuerzos:', error);
         res.status(500).json({ 
-            success: false, 
-            error: 'Error agregando almuerzo' 
+            error: 'Error interno del servidor',
+            almuerzos: []
         });
     }
 });
 
-app.delete('/api/almuerzos/:id', (req, res) => {
+app.post('/api/almuerzos', authMiddleware, async (req, res) => {
+    try {
+        const { nombre, descripcion, precio, categoria } = req.body;
+        
+        if (!nombre) {
+            return res.status(400).json({ error: 'El nombre es requerido' });
+        }
+        
+        const almuerzo = new AlmuerzoItem({
+            nombre: nombre.trim(),
+            descripcion: descripcion || '',
+            precio: precio ? parseFloat(precio) : 0,
+            categoria: categoria || 'acompanamiento',
+            disponible: true
+        });
+        
+        await almuerzo.save();
+        
+        // Obtener lista actualizada
+        const almuerzos = await AlmuerzoItem.find({ disponible: true })
+            .sort({ order: 1, categoria: 1 });
+        
+        // Emitir actualización por WebSocket
+        io.emit('almuerzos_updated', { almuerzos });
+        
+        res.json({ 
+            success: true, 
+            almuerzo,
+            message: 'Ítem agregado correctamente'
+        });
+        
+    } catch (error) {
+        console.error('Error creando ítem de almuerzo:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+});
+
+app.delete('/api/almuerzos/:id', authMiddleware, async (req, res) => {
     try {
         const { id } = req.params;
         
-        if (!id) {
-            return res.status(400).json({ 
-                success: false, 
-                error: 'ID del almuerzo es requerido' 
-            });
+        const result = await AlmuerzoItem.findByIdAndDelete(id);
+        
+        if (!result) {
+            return res.status(404).json({ error: 'Ítem no encontrado' });
         }
         
-        const result = adminFunctions.eliminarAlmuerzo(id);
-        console.log(`✅ Almuerzo eliminado ID: ${id}`);
-        res.json(result);
-    } catch (error) {
-        console.error('❌ Error en /api/almuerzos/:id:', error);
-        res.status(500).json({ 
-            success: false, 
-            error: 'Error eliminando almuerzo' 
+        // Obtener lista actualizada
+        const almuerzos = await AlmuerzoItem.find({ disponible: true })
+            .sort({ order: 1, categoria: 1 });
+        
+        io.emit('almuerzos_updated', { almuerzos });
+        
+        res.json({ 
+            success: true, 
+            message: 'Ítem eliminado correctamente',
+            almuerzos
         });
+        
+    } catch (error) {
+        console.error('Error eliminando ítem:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
 
-// 6. GUARDAR CONFIGURACIÓN DE RESERVAS
-app.post('/api/reservas', (req, res) => {
+// 4. RESERVAS
+app.get('/api/reservas', async (req, res) => {
     try {
-        const result = adminFunctions.guardarReservas(req.body);
-        console.log('✅ Configuración de reservas actualizada');
-        res.json(result);
+        let config = await ReservaConfig.findOne();
+        
+        if (!config) {
+            // Configuración por defecto
+            config = new ReservaConfig({
+                politicaCancelacion: 'Se puede cancelar sin costo hasta 2 días antes.',
+                politicaModificacion: 'Se puede modificar la reserva hasta 8 horas antes.',
+                politicaAbono: 'Para eventos especiales se requiere 10% de abono.',
+                bancoNombre: 'BANCOLOMBIA',
+                cuentaTipo: 'Ahorros',
+                cuentaNumero: '47675777558',
+                cuentaNombre: 'María Mendoza',
+                nequiNumero: '3105539582'
+            });
+            await config.save();
+        }
+        
+        res.json(config);
     } catch (error) {
-        console.error('❌ Error en /api/reservas:', error);
+        console.error('Error obteniendo configuración de reservas:', error);
         res.status(500).json({ 
-            success: false, 
-            error: 'Error guardando reservas' 
+            error: 'Error interno del servidor'
         });
     }
 });
 
-// 7. CAMBIAR CONTRASEÑA
-app.post('/api/change-password', (req, res) => {
+app.put('/api/reservas', authMiddleware, async (req, res) => {
+    try {
+        const { 
+            politicaCancelacion, 
+            politicaModificacion, 
+            politicaAbono,
+            bancoNombre,
+            cuentaTipo,
+            cuentaNumero,
+            cuentaNombre,
+            nequiNumero
+        } = req.body;
+        
+        const config = await ReservaConfig.findOneAndUpdate(
+            {},
+            { 
+                politicaCancelacion: politicaCancelacion || '',
+                politicaModificacion: politicaModificacion || '',
+                politicaAbono: politicaAbono || '',
+                bancoNombre: bancoNombre || '',
+                cuentaTipo: cuentaTipo || '',
+                cuentaNumero: cuentaNumero || '',
+                cuentaNombre: cuentaNombre || '',
+                nequiNumero: nequiNumero || '',
+                updatedAt: new Date()
+            },
+            { 
+                new: true, 
+                upsert: true 
+            }
+        );
+        
+        // Emitir actualización por WebSocket
+        io.emit('reservas_updated', { config });
+        
+        res.json({ 
+            success: true, 
+            config,
+            message: 'Configuración actualizada'
+        });
+        
+    } catch (error) {
+        console.error('Error actualizando reservas:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+});
+
+// 5. AUTENTICACIÓN ADMIN
+app.post('/api/admin/login', async (req, res) => {
+    try {
+        const { username, password } = req.body;
+        
+        if (!username || !password) {
+            return res.status(400).json({ error: 'Usuario y contraseña requeridos' });
+        }
+        
+        // Buscar admin
+        const admin = await Admin.findOne({ username });
+        
+        if (!admin) {
+            return res.status(401).json({ error: 'Credenciales incorrectas' });
+        }
+        
+        // Verificar contraseña
+        const isValidPassword = await bcrypt.compare(password, admin.password);
+        if (!isValidPassword) {
+            return res.status(401).json({ error: 'Credenciales incorrectas' });
+        }
+        
+        // Actualizar último login
+        admin.lastLogin = new Date();
+        await admin.save();
+        
+        // Generar token JWT
+        const token = jwt.sign(
+            { 
+                id: admin._id, 
+                username: admin.username, 
+                role: admin.role 
+            },
+            process.env.JWT_SECRET,
+            { expiresIn: '24h' }
+        );
+        
+        res.json({ 
+            success: true, 
+            token,
+            admin: {
+                username: admin.username,
+                email: admin.email,
+                lastLogin: admin.lastLogin
+            }
+        });
+        
+    } catch (error) {
+        console.error('Error en login:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+});
+
+app.get('/api/admin/verify', authMiddleware, async (req, res) => {
+    try {
+        const admin = await Admin.findById(req.user.id);
+        
+        if (!admin) {
+            return res.status(404).json({ error: 'Admin no encontrado' });
+        }
+        
+        res.json({ 
+            success: true,
+            admin: {
+                username: admin.username,
+                email: admin.email,
+                lastLogin: admin.lastLogin
+            }
+        });
+    } catch (error) {
+        console.error('Error verificando token:', error);
+        res.status(401).json({ error: 'Token inválido' });
+    }
+});
+
+app.put('/api/admin/username', authMiddleware, async (req, res) => {
+    try {
+        const { currentPassword, newUsername } = req.body;
+        
+        if (!currentPassword || !newUsername) {
+            return res.status(400).json({ error: 'Datos incompletos' });
+        }
+        
+        const admin = await Admin.findById(req.user.id);
+        if (!admin) {
+            return res.status(404).json({ error: 'Admin no encontrado' });
+        }
+        
+        // Verificar contraseña actual
+        const isValidPassword = await bcrypt.compare(currentPassword, admin.password);
+        if (!isValidPassword) {
+            return res.status(401).json({ error: 'Contraseña actual incorrecta' });
+        }
+        
+        // Actualizar username
+        admin.username = newUsername;
+        await admin.save();
+        
+        // Generar nuevo token
+        const newToken = jwt.sign(
+            { 
+                id: admin._id, 
+                username: admin.username, 
+                role: admin.role 
+            },
+            process.env.JWT_SECRET,
+            { expiresIn: '24h' }
+        );
+        
+        res.json({ 
+            success: true, 
+            token: newToken,
+            message: 'Usuario actualizado correctamente'
+        });
+        
+    } catch (error) {
+        console.error('Error cambiando username:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+});
+
+app.put('/api/admin/password', authMiddleware, async (req, res) => {
     try {
         const { currentPassword, newPassword } = req.body;
         
         if (!currentPassword || !newPassword) {
-            return res.status(400).json({ 
-                success: false, 
-                error: 'La contraseña actual y la nueva son requeridas' 
-            });
+            return res.status(400).json({ error: 'Datos incompletos' });
         }
         
         if (newPassword.length < 6) {
-            return res.status(400).json({ 
-                success: false, 
-                error: 'La nueva contraseña debe tener al menos 6 caracteres' 
-            });
+            return res.status(400).json({ error: 'La nueva contraseña debe tener al menos 6 caracteres' });
         }
         
-        const result = adminFunctions.cambiarPassword(currentPassword, newPassword);
-        res.json(result);
-    } catch (error) {
-        console.error('❌ Error en /api/change-password:', error);
-        res.status(500).json({ 
-            success: false, 
-            error: 'Error cambiando contraseña' 
+        const admin = await Admin.findById(req.user.id);
+        if (!admin) {
+            return res.status(404).json({ error: 'Admin no encontrado' });
+        }
+        
+        // Verificar contraseña actual
+        const isValidPassword = await bcrypt.compare(currentPassword, admin.password);
+        if (!isValidPassword) {
+            return res.status(401).json({ error: 'Contraseña actual incorrecta' });
+        }
+        
+        // Actualizar contraseña
+        admin.password = newPassword;
+        await admin.save();
+        
+        res.json({ 
+            success: true, 
+            message: 'Contraseña actualizada correctamente'
         });
+        
+    } catch (error) {
+        console.error('Error cambiando password:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
 
-// 8. VERIFICAR TOKEN (simplificado)
-app.get('/api/auth/verify', (req, res) => {
-    res.json({ 
-        valid: true,
-        timestamp: new Date().toISOString()
-    });
-});
+// 6. CREAR ADMIN POR DEFECTO
+async function createDefaultAdmin() {
+    try {
+        const adminExists = await Admin.findOne({ username: 'admin' });
+        
+        if (!adminExists) {
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash('admin123', salt);
+            
+            const admin = new Admin({
+                username: 'admin',
+                password: hashedPassword,
+                email: 'admin@manarestobar.com',
+                role: 'admin'
+            });
+            
+            await admin.save();
+            console.log('✅ Admin por defecto creado');
+            console.log('👤 Usuario: admin');
+            console.log('🔐 Contraseña: admin123');
+            console.log('⚠️ ¡Cambia la contraseña después del primer login!');
+        } else {
+            console.log('✅ Admin ya existe en la base de datos');
+        }
+    } catch (error) {
+        console.error('Error creando admin por defecto:', error);
+    }
+}
 
-// 9. RUTA DE SALUD
+// 7. RUTA DE PRUEBA
 app.get('/api/health', (req, res) => {
-    res.json({
-        status: 'OK',
-        server: 'Mana Restobar API',
-        timestamp: new Date().toISOString(),
-        version: '1.0.0',
-        uptime: process.uptime()
+    res.json({ 
+        status: 'ok', 
+        timestamp: new Date(),
+        services: {
+            mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+            websockets: io.engine.clientsCount
+        }
     });
 });
 
-// ===== RUTA PARA SERVIR EL PDF =====
-app.get('/api/menu/current', (req, res) => {
-    const pdfPath = path.join(imagesDir, 'menu-actual.pdf');
+// ============================
+// RUTAS DE ADMIN (HTML)
+// ============================
+app.get('/admin', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/admin.html'));
+});
+
+// ============================
+// RUTA POR DEFECTO
+// ============================
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/index.html'));
+});
+
+// ============================
+// INICIAR SERVIDOR
+// ============================
+mongoose.connection.once('open', async () => {
+    console.log('📊 Base de datos lista');
+    await createDefaultAdmin();
     
-    if (fs.existsSync(pdfPath)) {
-        res.sendFile(pdfPath);
-    } else {
-        res.status(404).json({ 
-            error: 'No hay menú PDF disponible' 
-        });
-    }
-});
-
-// ===== RUTA PARA DESCARGAR BACKUP =====
-app.get('/api/backup', (req, res) => {
-    try {
-        const data = adminFunctions.obtenerTodosDatos();
-        res.setHeader('Content-Type', 'application/json');
-        res.setHeader('Content-Disposition', 'attachment; filename="backup-data.json"');
-        res.send(JSON.stringify(data, null, 2));
-    } catch (error) {
-        res.status(500).json({ error: 'Error generando backup' });
-    }
-});
-
-// ===== MANEJO DE ERRORES =====
-
-// Ruta no encontrada
-app.use((req, res) => {
-    res.status(404).json({
-        error: 'Ruta no encontrada',
-        path: req.path,
-        method: req.method
+    server.listen(PORT, () => {
+        console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+        console.log(`📁 Panel admin: http://localhost:${PORT}/admin`);
+        console.log(`🔗 WebSockets activos en puerto ${PORT}`);
     });
 });
 
-// Error handler global
-app.use((err, req, res, next) => {
-    console.error('❌ Error global:', err.stack || err.message);
-    
-    res.status(500).json({
-        error: 'Error interno del servidor',
-        message: process.env.NODE_ENV === 'development' ? err.message : undefined
-    });
-});
-// ===== SERVIR LA APLICACIÓN REACT DEL ADMIN =====
-// Ruta para servir la aplicación React del admin
-app.use('/admin-react', express.static(path.join(__dirname, '../dist')));
-
-// Redirigir /admin a la nueva aplicación React
-app.get('/admin-react', (req, res) => {
-  res.sendFile(path.join(__dirname, '../dist/index.html'));
+// Manejo de errores
+process.on('uncaughtException', (error) => {
+    console.error('⚠️ Error no capturado:', error);
 });
 
-// Redirigir desde el admin.html antiguo al nuevo
-app.get('/admin.html', (req, res) => {
-  res.redirect('/admin-react');
-});
-
-
-// ===== INICIAR SERVIDOR =====
-// Busca la parte del console.log inicial y actualízala:
-app.listen(PORT, () => {
-    console.log('='.repeat(50));
-    console.log(`✅ Servidor Maná Restobar iniciado`);
-    console.log(`🌐 URL: http://localhost:${PORT}`);
-    console.log(`📁 Panel admin: http://localhost:${PORT}/admin.html`);
-    
-    // Mostrar credenciales actuales
-    try {
-        const data = adminFunctions.leerDatos();
-        const username = data.config?.username || 'admin';
-        const password = data.config?.password || 'Patoazul';
-        console.log(`🔑 Credenciales: ${username} / ${password}`);
-    } catch (error) {
-        console.log(`🔑 Credenciales: admin / Patoazul (por defecto)`);
-    }
-    
-    console.log('='.repeat(50));
-    console.log('🚀 Servidor listo para recibir peticiones...');
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('⚠️ Promise rechazada no manejada:', reason);
 });

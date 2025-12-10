@@ -65,6 +65,51 @@
             from { opacity: 0; }
             to { opacity: 1; }
         }
+        
+        /* Estilos para notificaciones */
+        .notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            max-width: 350px;
+        }
+        
+        .notification {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border-left: 4px solid #3498db;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .notification.success {
+            border-left-color: #2ecc71;
+        }
+        
+        .notification.error {
+            border-left-color: #e74c3c;
+        }
+        
+        .notification.info {
+            border-left-color: #3498db;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
     </style>
 </head>
 <body>
@@ -76,10 +121,10 @@
             </div>
             <nav class="nav">
                 <ul>
-                    <li><a href="#inicio" class="nav-link active" data-section="inicio">Inicio</a></li>
-                    <li><a href="#menu" class="nav-link" data-section="menu">Menú</a></li>
-                    <li><a href="#arma-almuerzo" class="nav-link" data-section="arma-almuerzo">Arma tu Almuerzo</a></li>
-                    <li><a href="#reservas" class="nav-link" data-section="reservas">Reservas</a></li>
+                    <li><a href="#inicio" class="nav-link active" data-target="inicio-section">Inicio</a></li>
+                    <li><a href="#menu" class="nav-link" data-target="menu-section">Menú</a></li>
+                    <li><a href="#arma-almuerzo" class="nav-link" data-target="arma-almuerzo-section">Arma tu Almuerzo</a></li>
+                    <li><a href="#reservas" class="nav-link" data-target="reservas-section">Reservas</a></li>
                 </ul>
             </nav>
             <div class="social-icons">
@@ -102,8 +147,8 @@
                     <h1>Bienvenido a Maná Restobar</h1>
                     <p>El corazón de Pamplona donde cada taza de café y cada plato se sirve con amor familiar.</p>
                     <div class="hero-buttons">
-                        <a href="#menu" class="btn nav-section-btn" data-section="menu">Ver Menú</a>
-                        <a href="#reservas" class="btn btn-secondary nav-section-btn" data-section="reservas">Reservar Mesa</a>
+                        <a href="#menu" class="btn nav-section-btn" data-target="menu-section">Ver Menú</a>
+                        <a href="#reservas" class="btn btn-secondary nav-section-btn" data-target="reservas-section">Reservar Mesa</a>
                     </div>
                 </div>
             </div>
@@ -113,9 +158,9 @@
                 <div class="historia-section">
                     <h2>Nuestra Historia</h2>
                     <div class="historia-content" id="historia-dinamica">
-                     <!-- La historia se cargará aquí dinámicamente desde la API -->
-                     <p>Cargando historia...</p>
-<                       /div>
+                        <!-- La historia se cargará aquí dinámicamente desde la API -->
+                        <p>Cargando historia...</p>
+                    </div>
                 </div>
 
                 <div class="galeria-section">
@@ -155,13 +200,14 @@
                 <!-- Contenedor del PDF - SOLUCIÓN SIMPLE -->
                 <div class="pdf-container">
                     <iframe 
-                        src="images/carta-completa.pdf.pdf" 
+                        src="images/menu-actual.pdf" 
                         class="pdf-viewer"
                         title="Menú Maná Restobar"
+                        id="pdf-frame"
                     >
                         <p style="text-align: center; padding: 40px;">
                             Tu navegador no puede mostrar el PDF. 
-                            <a href="images/carta-completa.pdf.pdf" download style="color: #d4af37; font-weight: bold;">
+                            <a href="images/menu-actual.pdf" download style="color: #d4af37; font-weight: bold;">
                                 Descarga el menú aquí
                             </a>
                         </p>
@@ -173,7 +219,7 @@
                     <p style="color: #666; margin-bottom: 10px;">
                         <i class="fas fa-info-circle"></i> Si no ves el menú, intenta:
                     </p>
-                    <a href="images/carta-completa.pdf.pdf" target="_blank" 
+                    <a href="images/menu-actual.pdf" target="_blank" 
                        style="background: #d4af37; color: white; padding: 10px 20px; 
                               border-radius: 5px; text-decoration: none; display: inline-block;">
                         <i class="fas fa-external-link-alt"></i> Abrir en nueva pestaña
@@ -203,7 +249,8 @@
                 <div class="build-lunch-container-new">
                     <!-- Parte izquierda - Opciones -->
                     <div class="options-side">
-                        <div class="options-grid-simple">
+                        <div class="options-grid-simple" id="almuerzos-options">
+                            <!-- Las opciones se mantienen igual que antes -->
                             <div class="option-card" data-name="Arroz" data-price="4000">
                                 <div class="option-icon">🍚</div>
                                 <div class="option-details">
@@ -514,296 +561,11 @@
         </div>
     </footer>
 
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // ===== Navegación entre secciones =====
-        const navLinks = document.querySelectorAll('.nav-link');
-        const sections = document.querySelectorAll('.section');
-        
-        function showSection(sectionId) {
-            // Ocultar todas las secciones
-            sections.forEach(section => {
-                section.classList.remove('active');
-            });
-            
-            // Remover clase activa de todos los enlaces
-            navLinks.forEach(link => {
-                link.classList.remove('active');
-            });
-            
-            // Mostrar sección seleccionada
-            const targetSection = document.getElementById(sectionId + '-section');
-            if (targetSection) {
-                targetSection.classList.add('active');
-            }
-            
-            // Activar enlace correspondiente
-            const activeLink = document.querySelector(`[data-section="${sectionId}"]`);
-            if (activeLink) {
-                activeLink.classList.add('active');
-            }
-            
-            // Actualizar URL
-            window.location.hash = sectionId;
-        }
-        
-        // Manejar clics en enlaces de navegación
-        navLinks.forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                const sectionId = this.getAttribute('data-section');
-                showSection(sectionId);
-            });
-        });
-        
-        // Manejar clics en botones que navegan a secciones
-        document.querySelectorAll('.nav-section-btn').forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.preventDefault();
-                const sectionId = this.getAttribute('data-section');
-                showSection(sectionId);
-            });
-        });
-        
-        // Cargar sección basada en el hash de la URL
-        function loadInitialSection() {
-            const hash = window.location.hash.substring(1);
-            if (hash && ['inicio', 'menu', 'arma-almuerzo', 'reservas'].includes(hash)) {
-                showSection(hash);
-            } else {
-                showSection('inicio');
-            }
-        }
-        
-        loadInitialSection();
-        cargarHistoria();
-        
-        // ===== Verificar si el PDF se carga =====
-        function checkPdfLoaded() {
-            const pdfIframe = document.querySelector('.pdf-viewer');
-            const pdfMessage = document.getElementById('pdf-message');
-            
-            if (pdfIframe) {
-                // Después de 3 segundos, verificar si el PDF cargó
-                setTimeout(function() {
-                    try {
-                        // Intentar acceder al contenido del iframe
-                        const iframeDoc = pdfIframe.contentDocument || pdfIframe.contentWindow.document;
-                        
-                        // Si no hay contenido o hay error, mostrar mensaje
-                        if (!iframeDoc || iframeDoc.body.innerHTML.includes('404') || iframeDoc.body.innerHTML.includes('Error')) {
-                            pdfMessage.style.display = 'block';
-                        }
-                    } catch (error) {
-                        // Error de CORS, mostrar mensaje
-                        pdfMessage.style.display = 'block';
-                    }
-                }, 3000);
-            }
-        }
-        
-        // Verificar PDF al cargar la página
-        checkPdfLoaded();
-        
-        // ===== Sistema "Arma tu Almuerzo" =====
-        const optionCards = document.querySelectorAll('.option-card');
-        const selectedItemsContainer = document.getElementById('selectedItems');
-        const totalAmountElement = document.getElementById('totalAmount');
-        const paraLlevarCheckbox = document.getElementById('paraLlevar');
-        const sendOrderBtn = document.getElementById('sendOrderBtn');
-        
-        let selectedItems = [];
-        let total = 0;
-        
-        function updateTotal() {
-            total = selectedItems.reduce((sum, item) => sum + item.price, 0);
-            
-            if (paraLlevarCheckbox.checked) {
-                total += parseInt(paraLlevarCheckbox.value);
-            }
-            
-            totalAmountElement.textContent = '$' + total.toLocaleString();
-        }
-        
-        function updateSelectedItemsDisplay() {
-            if (selectedItems.length === 0) {
-                selectedItemsContainer.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">📝</div>
-                        <p class="empty-text">Selecciona los ítems de tu almuerzo</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            let html = '';
-            selectedItems.forEach((item, index) => {
-                html += `
-                    <div class="selected-item">
-                        <div class="selected-item-info">
-                            <span class="selected-item-name">${item.name}</span>
-                            <span class="selected-item-price">$${item.price.toLocaleString()}</span>
-                        </div>
-                        <button class="remove-item-btn" data-index="${index}">×</button>
-                    </div>
-                `;
-            });
-            
-            selectedItemsContainer.innerHTML = html;
-            
-            // Agregar eventos a botones de eliminar
-            document.querySelectorAll('.remove-item-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const index = parseInt(this.getAttribute('data-index'));
-                    selectedItems.splice(index, 1);
-                    updateSelectedItemsDisplay();
-                    updateTotal();
-                });
-            });
-        }
-        
-        optionCards.forEach(card => {
-            card.addEventListener('click', function() {
-                const name = this.getAttribute('data-name');
-                const price = parseInt(this.getAttribute('data-price'));
-                
-                // Agregar al carrito
-                selectedItems.push({ name, price });
-                
-                updateSelectedItemsDisplay();
-                updateTotal();
-            });
-        });
-        
-        paraLlevarCheckbox.addEventListener('change', updateTotal);
-        
-        sendOrderBtn.addEventListener('click', function() {
-            if (selectedItems.length === 0) {
-                alert('Por favor selecciona al menos un ítem para tu almuerzo.');
-                return;
-            }
-            
-            let message = '¡Hola! Me gustaría ordenar:\n\n';
-            
-            selectedItems.forEach(item => {
-                message += `• ${item.name} - $${item.price.toLocaleString()}\n`;
-            });
-            
-            if (paraLlevarCheckbox.checked) {
-                message += `\n• Para llevar - $1.000\n`;
-            }
-            
-            message += `\n*Total: $${total.toLocaleString()}*\n`;
-            message += '\nGracias.';
-            
-            const phoneNumber = '573150118386';
-            const encodedMessage = encodeURIComponent(message);
-            const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
-            
-            window.open(whatsappUrl, '_blank');
-        });
-        
-        // ===== Funcionalidad del formulario de reservas =====
-        const reservaForm = document.getElementById('reservaForm');
-        
-        reservaForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const personas = document.getElementById('personas').value;
-            const hora = document.getElementById('hora').value;
-            const fecha = document.getElementById('fecha').value;
-            const plato = document.getElementById('plato').value;
-            const observaciones = document.getElementById('observaciones').value;
-            
-            let message = '¡Hola! Me gustaría hacer una reserva:\n\n';
-            message += `*Número de personas:* ${personas}\n`;
-            message += `*Fecha:* ${fecha}\n`;
-            message += `*Hora:* ${hora}\n`;
-            
-            if (plato) {
-                message += `*Plato especial:* ${plato}\n`;
-            }
-            
-            if (observaciones) {
-                message += `*Observaciones:* ${observaciones}\n`;
-            }
-            
-            message += '\nGracias.';
-            
-            const phoneNumber = '573150118386';
-            const encodedMessage = encodeURIComponent(message);
-            const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
-            
-            window.open(whatsappUrl, '_blank');
-        });
-        
-        // Establecer fecha mínima para el campo de fecha (hoy)
-        const fechaInput = document.getElementById('fecha');
-        if (fechaInput) {
-            const today = new Date().toISOString().split('T')[0];
-            fechaInput.min = today;
-        }
-        
-        // Si hay un error al cargar imágenes, ocultarlas
-        document.querySelectorAll('img').forEach(img => {
-            img.onerror = function() {
-                this.style.display = 'none';
-            };
-        });
-        
-        // Ajustar altura del PDF según el dispositivo
-        function adjustPdfHeight() {
-            const pdfIframe = document.querySelector('.pdf-viewer');
-            
-            if (!pdfIframe) return;
-            
-            const isMobile = window.innerWidth <= 768;
-            const isTablet = window.innerWidth <= 1024;
-            
-            if (isMobile) {
-                pdfIframe.style.height = '400px';
-            } else if (isTablet) {
-                pdfIframe.style.height = '500px';
-            } else {
-                pdfIframe.style.height = '700px';
-            }
-        }
-        
-        window.addEventListener('resize', adjustPdfHeight);
-        setTimeout(adjustPdfHeight, 100);
-    });
+    <!-- Contenedor para notificaciones -->
+    <div id="notification-container" class="notification-container"></div>
 
-// Agrega esta función al final de tu index.html, DENTRO de la etiqueta <script>
-function cargarHistoria() {
-    const historiaDiv = document.getElementById('historia-dinamica');
-    
-    // 1. Solicitamos el texto guardado a la ruta API que creaste
-    fetch('/api/historia')
-        .then(res => {
-            if (!res.ok) throw new Error('Error de red');
-            return res.json();
-        })
-        .then(data => {
-            // 2. Verificamos que la respuesta sea exitosa y contenga texto
-            if (data.success && data.texto) {
-                // Para que los saltos de línea se vean en HTML, los reemplazamos por <br>
-                const textoFormateado = data.texto.replace(/\n/g, '<br>');
-                historiaDiv.innerHTML = `<p>${textoFormateado}</p>`;
-            } else {
-                // En caso de que el dato esté vacío o la API no devuelva 'success: true'
-                historiaDiv.innerHTML = '<p>Aún no se ha definido la historia del restaurante.</p>';
-            }
-        })
-        .catch(error => {
-            // Manejo de errores
-            console.error('Error cargando la historia desde el servidor:', error);
-            historiaDiv.innerHTML = '<p>Lo sentimos, hubo un error al cargar la historia.</p>';
-        });
-}
-
-
-
-    </script>
-     
+    <!-- JavaScript -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/main.js"></script>
 </body>
 </html>
