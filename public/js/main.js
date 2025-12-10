@@ -140,7 +140,7 @@ function loadPDF() {
 // ARMA TU ALMUERZO
 // ============================
 function initAlmuerzo() {
-    const optionCards = document.querySelectorAll('.option-card');
+    const optionCardsContainer = document.querySelector('.options-grid-simple');
     const selectedItemsContainer = document.getElementById('selectedItems');
     const totalAmountElement = document.getElementById('totalAmount');
     const sendOrderBtn = document.getElementById('sendOrderBtn');
@@ -148,7 +148,43 @@ function initAlmuerzo() {
     
     let selectedItems = [];
     let total = 0;
-    
+
+    // Cargar opciones de almuerzo desde API
+    async function cargarOpcionesAlmuerzo() {
+        try {
+            const res = await fetch('/api/almuerzos/public');
+            const opciones = await res.json();
+            if (Array.isArray(opciones) && opciones.length > 0) {
+                optionCardsContainer.innerHTML = opciones.map(item => `
+                    <div class="option-card" data-name="${item.nombre}" data-price="${item.precio}">
+                        <div class="option-icon">🍽️</div>
+                        <div class="option-details">
+                            <h3 class="option-title">${item.nombre}</h3>
+                            <p class="option-price">$${item.precio.toLocaleString()}</p>
+                            <p class="option-subtitle">${item.categoria}</p>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        } catch (err) {
+            // Si falla, deja las hardcodeadas
+        }
+        // Re-asignar eventos
+        document.querySelectorAll('.option-card').forEach(card => {
+            card.addEventListener('click', function() {
+                const name = this.getAttribute('data-name');
+                const price = parseInt(this.getAttribute('data-price'));
+                this.classList.add('selected');
+                setTimeout(() => {
+                    this.classList.remove('selected');
+                }, 300);
+                addItem(name, price);
+            });
+        });
+    }
+
+    cargarOpcionesAlmuerzo();
+
     // Función para actualizar el resumen
     function updateSummary() {
         // Calcular total
@@ -218,23 +254,6 @@ function initAlmuerzo() {
         showNotification(`${removedItem.name} eliminado del pedido`, 'info');
     }
     
-    // Eventos para las tarjetas de opciones
-    optionCards.forEach(card => {
-        card.addEventListener('click', function() {
-            const name = this.getAttribute('data-name');
-            const price = parseInt(this.getAttribute('data-price'));
-            
-            // Efecto visual de selección
-            this.classList.add('selected');
-            setTimeout(() => {
-                this.classList.remove('selected');
-            }, 300);
-            
-            // Añadir el ítem
-            addItem(name, price);
-        });
-    });
-    
     // Evento para el checkbox de "para llevar"
     if (paraLlevarCheckbox) {
         paraLlevarCheckbox.addEventListener('change', updateSummary);
@@ -279,7 +298,7 @@ function initAlmuerzo() {
         });
     }
     
-    console.log(`✅ Sistema "Arma tu Almuerzo" inicializado (${optionCards.length} opciones)`);
+    console.log(`✅ Sistema "Arma tu Almuerzo" inicializado (${optionCardsContainer.children.length} opciones)`);
 }
 
 // ============================

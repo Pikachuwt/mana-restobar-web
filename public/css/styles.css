@@ -440,6 +440,22 @@ main {
     border-bottom: 1px solid #e0e0e0;
 }
 
+/* Loader para PDF */
+.pdf-loader {
+    text-align: center;
+    padding: 60px 0;
+}
+
+.pdf-loader i {
+    font-size: 2rem;
+    color: #667eea;
+}
+
+.pdf-loader p {
+    margin-top: 15px;
+    color: #666;
+}
+
 /* Responsive para PDF */
 @media (max-width: 768px) {
     .pdf-viewer {

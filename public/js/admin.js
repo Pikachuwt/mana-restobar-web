@@ -25,13 +25,14 @@ async function login(username, password) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password })
         });
-        
+
         const data = await response.json();
-        
+
         if (data.success) {
             localStorage.setItem('adminToken', data.token);
             showAdminPanel();
             loadAdminData();
+            document.getElementById('currentUsernameDisplay').textContent = data.admin.username;
         } else {
             alert('Error: ' + (data.error || 'Credenciales incorrectas'));
         }
@@ -48,10 +49,12 @@ async function checkAuth() {
             const response = await fetch(`${API_URL}/admin/verify`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-            
+
             if (response.ok) {
+                const data = await response.json();
                 showAdminPanel();
                 loadAdminData();
+                document.getElementById('currentUsernameDisplay').textContent = data.admin.username;
             } else {
                 localStorage.removeItem('adminToken');
             }
@@ -195,19 +198,20 @@ async function subirPDF() {
 // ==================== ALMUERZOS ====================
 function renderAlmuerzos(almuerzos) {
     const container = document.getElementById('listaAlmuerzos');
-    
     if (!almuerzos || almuerzos.length === 0) {
         container.innerHTML = '<div class="lunch-item" style="justify-content:center;color:#999;">No hay opciones</div>';
         return;
     }
-    
     container.innerHTML = almuerzos.map(item => `
         <div class="lunch-item">
             <div>
-                <strong>${item.nombre || item.name}</strong>
-                <span style="color:#666; font-size:0.9em;"> - $${(item.precio || item.price || 0).toLocaleString()}</span>
+                <strong>${item.nombre}</strong>
+                <span style="color:#666; font-size:0.9em;"> - $${(item.precio || 0).toLocaleString()}</span>
+                <span style="color:#888; font-size:0.8em; margin-left:10px;">(${item.categoria})</span>
             </div>
-            <i class="fas fa-trash-alt btn-delete" onclick="eliminarAlmuerzo('${item._id}')"></i>
+            <button class="btn-delete" onclick="eliminarAlmuerzo('${item._id}')">
+                <i class="fas fa-trash-alt"></i>
+            </button>
         </div>
     `).join('');
 }
@@ -215,12 +219,11 @@ function renderAlmuerzos(almuerzos) {
 async function agregarAlmuerzo() {
     const nombre = document.getElementById('nuevoAlmuerzoNombre').value.trim();
     const precio = parseFloat(document.getElementById('nuevoAlmuerzoPrecio').value) || 0;
-    
-    if (!nombre) {
-        alert('⚠️ Ingresa un nombre para el ítem');
+    const categoria = document.getElementById('nuevoAlmuerzoCategoria').value;
+    if (!nombre || !categoria) {
+        alert('⚠️ Ingresa nombre y categoría');
         return;
     }
-    
     try {
         const response = await fetch(`${API_URL}/almuerzos`, {
             method: 'POST',
@@ -228,20 +231,16 @@ async function agregarAlmuerzo() {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
             },
-            body: JSON.stringify({ 
-                nombre, 
-                precio,
-                categoria: 'acompanamiento',
-                disponible: true 
-            })
+            body: JSON.stringify({ nombre, precio, categoria, disponible: true })
         });
-        
         const data = await response.json();
         if (data.success) {
             alert('✅ Ítem agregado');
             document.getElementById('nuevoAlmuerzoNombre').value = '';
             document.getElementById('nuevoAlmuerzoPrecio').value = '';
-            loadAdminData(); // Recargar lista
+            loadAdminData();
+        } else {
+            alert('❌ Error: ' + (data.error || 'No se pudo agregar'));
         }
     } catch (error) {
         alert('❌ Error agregando ítem');
@@ -250,7 +249,6 @@ async function agregarAlmuerzo() {
 
 async function eliminarAlmuerzo(id) {
     if (!confirm('¿Eliminar este ítem?')) return;
-    
     try {
         const response = await fetch(`${API_URL}/almuerzos/${id}`, {
             method: 'DELETE',
@@ -258,10 +256,12 @@ async function eliminarAlmuerzo(id) {
                 'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
             }
         });
-        
-        if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
             alert('✅ Ítem eliminado');
-            loadAdminData(); // Recargar lista
+            loadAdminData();
+        } else {
+            alert('❌ Error: ' + (data.error || 'No se pudo eliminar'));
         }
     } catch (error) {
         alert('❌ Error eliminando ítem');

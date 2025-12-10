@@ -664,9 +664,6 @@
                                 <label for="nuevoAlmuerzoPrecio">Precio ($)</label>
                                 <input type="number" id="nuevoAlmuerzoPrecio" placeholder="Ej: 5000" min="0">
                             </div>
-                        </div>
-                        
-                        <div class="input-group-row">
                             <div class="form-group">
                                 <label for="nuevoAlmuerzoCategoria">Categoría</label>
                                 <select id="nuevoAlmuerzoCategoria">
@@ -1197,16 +1194,6 @@
                 console.error('Error cambiando password:', error);
             }
         }
-        
-        // Hacer funciones disponibles globalmente
-        window.guardarHistoria = guardarHistoria;
-        window.manejarSeleccionPDF = manejarSeleccionPDF;
-        window.subirPDF = subirPDF;
-        window.agregarAlmuerzo = agregarAlmuerzo;
-        window.eliminarAlmuerzo = eliminarAlmuerzo;
-        window.guardarReservas = guardarReservas;
-        window.cambiarUsername = cambiarUsername;
-        window.cambiarPassword = cambiarPassword;
     </script>
 </body>
 </html>

@@ -5,22 +5,28 @@ const bcrypt = require('bcrypt');
 const authController = {
     login: async (req, res) => {
         try {
+            console.log('🔐 Intento de login:', req.body.username);
             const { username, password } = req.body;
             
             // Buscar admin
             const admin = await Admin.findOne({ username });
             
             if (!admin) {
+                console.log('❌ Usuario no encontrado:', username);
                 return res.status(401).json({
                     success: false,
                     error: 'Credenciales incorrectas'
                 });
             }
             
+            console.log('✅ Usuario encontrado:', admin.username);
+            
             // Verificar contraseña
             const isPasswordValid = await bcrypt.compare(password, admin.password);
+            console.log('🔑 Contraseña válida:', isPasswordValid);
             
             if (!isPasswordValid) {
+                console.log('❌ Contraseña incorrecta');
                 return res.status(401).json({
                     success: false,
                     error: 'Credenciales incorrectas'
@@ -34,9 +40,11 @@ const authController = {
             // Generar token
             const token = jwt.sign(
                 { _id: admin._id, username: admin.username },
-                process.env.JWT_SECRET,
+                process.env.JWT_SECRET || 'secreto-temporal-cambiar',
                 { expiresIn: '24h' }
             );
+            
+            console.log('✅ Login exitoso para:', admin.username);
             
             res.json({
                 success: true,
@@ -50,7 +58,7 @@ const authController = {
             });
             
         } catch (error) {
-            console.error('Error en login:', error);
+            console.error('❌ Error en login:', error);
             res.status(500).json({
                 success: false,
                 error: 'Error del servidor'
@@ -108,7 +116,7 @@ const authController = {
             // Generar nuevo token
             const token = jwt.sign(
                 { _id: admin._id, username: admin.username },
-                process.env.JWT_SECRET,
+                process.env.JWT_SECRET || 'secreto-temporal-cambiar',
                 { expiresIn: '24h' }
             );
             

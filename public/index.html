@@ -165,13 +165,12 @@
         </section>
 
         <!-- Sección MENÚ -->
-        <!-- Sección MENÚ -->
-<section id="menu-section" class="section">
+        <section id="menu-section" class="section">
     <div class="container">
         <h2 class="section-title">Nuestro Menú</h2>
         
         <!-- Contenedor del PDF optimizado -->
-        <div class="pdf-container">
+        <div class="pdf-container" id="pdfContainer">
             <div class="pdf-actions" style="text-align: center; margin-bottom: 20px;">
                 <a href="images/menu-actual.pdf" download class="btn" style="margin-right: 10px;">
                     <i class="fas fa-download"></i> Descargar Menú
@@ -180,20 +179,11 @@
                     <i class="fas fa-external-link-alt"></i> Abrir en nueva pestaña
                 </a>
             </div>
-            
-            <iframe 
-                src="images/menu-actual.pdf#view=FitH&toolbar=0&navpanes=0" 
-                class="pdf-viewer" 
-                title="Menú Maná Restobar"
-                id="pdf-frame"
-                loading="lazy">
-                <p style="text-align: center; padding: 40px;">
-                    Tu navegador no puede mostrar el PDF. 
-                    <a href="images/menu-actual.pdf" download style="color: #d4af37; font-weight: bold;">
-                        Descarga el menú aquí
-                    </a>
-                </p>
-            </iframe>
+            <div id="pdfLoader" style="text-align:center; padding:60px 0;">
+                <i class="fas fa-spinner fa-spin" style="font-size:2rem; color:#667eea;"></i>
+                <p style="margin-top:15px; color:#666;">Cargando menú PDF...</p>
+            </div>
+            <!-- El iframe se insertará dinámicamente -->
         </div>
         
         <!-- Información adicional del menú -->
@@ -583,6 +573,8 @@
             // Cargar contenido específico si es necesario
             if (sectionId === 'inicio-section') {
                 cargarHistoria();
+            } else if (sectionId === 'menu-section') {
+                cargarPDFMenu();
             }
         }
     }

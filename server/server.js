@@ -38,23 +38,23 @@ app.use(fileUpload({
 // Servir archivos estáticos
 app.use(express.static(path.join(__dirname, '../public')));
 
-// Middleware de autenticación
-// Middleware de autenticación SIMPLIFICADO
-const authMiddleware = (req, res, next) => {
+// Middleware de autenticación con JWT y usuario real
+const authMiddleware = async (req, res, next) => {
     const token = req.headers.authorization?.replace('Bearer ', '');
-    
     if (!token) {
         return res.status(401).json({ error: 'Acceso no autorizado. Token requerido.' });
     }
-    
-    // Verificación simple del token
-    if (!token.startsWith('dummy-token-')) {
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const admin = await Admin.findById(decoded._id);
+        if (!admin) {
+            return res.status(401).json({ error: 'Token inválido.' });
+        }
+        req.user = { id: admin._id, username: admin.username, role: admin.role };
+        next();
+    } catch (err) {
         return res.status(401).json({ error: 'Token inválido.' });
     }
-    
-    // Simular usuario autenticado
-    req.user = { username: 'admin', role: 'admin' };
-    next();
 };
 
 // Conexión a MongoDB
@@ -236,36 +236,29 @@ app.post('/api/menu/pdf', authMiddleware, async (req, res) => {
 // 3. ALMUERZOS
 app.get('/api/almuerzos', async (req, res) => {
     try {
-        const almuerzos = await AlmuerzoItem.find({ disponible: true })
-            .sort({ order: 1, categoria: 1 });
-        
-        if (!almuerzos || almuerzos.length === 0) {
-            // Datos de ejemplo si la base está vacía
-            return res.json([
-                { _id: '1', nombre: 'Arroz', precio: 4000, categoria: 'acompanamiento' },
-                { _id: '2', nombre: 'Papas a la Francesa', precio: 5200, categoria: 'acompanamiento' },
-                { _id: '3', nombre: 'Carnes', precio: 8900, categoria: 'proteina' }
-            ]);
-        }
-        
+        const almuerzos = await AlmuerzoItem.find({ disponible: true }).sort({ order: 1, categoria: 1 });
         res.json(almuerzos);
     } catch (error) {
-        console.error('Error obteniendo almuerzos:', error);
-        res.status(500).json({ 
-            error: 'Error interno del servidor',
-            almuerzos: []
-        });
+        res.status(500).json({ error: 'Error interno del servidor', almuerzos: [] });
+    }
+});
+
+// Endpoint público para el cliente (sin auth, solo disponibles)
+app.get('/api/almuerzos/public', async (req, res) => {
+    try {
+        const almuerzos = await AlmuerzoItem.find({ disponible: true }).sort({ order: 1, categoria: 1 });
+        res.json(almuerzos);
+    } catch (error) {
+        res.status(500).json({ almuerzos: [] });
     }
 });
 
 app.post('/api/almuerzos', authMiddleware, async (req, res) => {
     try {
         const { nombre, descripcion, precio, categoria } = req.body;
-        
         if (!nombre) {
             return res.status(400).json({ error: 'El nombre es requerido' });
         }
-        
         const almuerzo = new AlmuerzoItem({
             nombre: nombre.trim(),
             descripcion: descripcion || '',
@@ -273,24 +266,11 @@ app.post('/api/almuerzos', authMiddleware, async (req, res) => {
             categoria: categoria || 'acompanamiento',
             disponible: true
         });
-        
         await almuerzo.save();
-        
-        // Obtener lista actualizada
-        const almuerzos = await AlmuerzoItem.find({ disponible: true })
-            .sort({ order: 1, categoria: 1 });
-        
-        // Emitir actualización por WebSocket
+        const almuerzos = await AlmuerzoItem.find({ disponible: true }).sort({ order: 1, categoria: 1 });
         io.emit('almuerzos_updated', { almuerzos });
-        
-        res.json({ 
-            success: true, 
-            almuerzo,
-            message: 'Ítem agregado correctamente'
-        });
-        
+        res.json({ success: true, almuerzo, message: 'Ítem agregado correctamente' });
     } catch (error) {
-        console.error('Error creando ítem de almuerzo:', error);
         res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
@@ -298,27 +278,14 @@ app.post('/api/almuerzos', authMiddleware, async (req, res) => {
 app.delete('/api/almuerzos/:id', authMiddleware, async (req, res) => {
     try {
         const { id } = req.params;
-        
         const result = await AlmuerzoItem.findByIdAndDelete(id);
-        
         if (!result) {
             return res.status(404).json({ error: 'Ítem no encontrado' });
         }
-        
-        // Obtener lista actualizada
-        const almuerzos = await AlmuerzoItem.find({ disponible: true })
-            .sort({ order: 1, categoria: 1 });
-        
+        const almuerzos = await AlmuerzoItem.find({ disponible: true }).sort({ order: 1, categoria: 1 });
         io.emit('almuerzos_updated', { almuerzos });
-        
-        res.json({ 
-            success: true, 
-            message: 'Ítem eliminado correctamente',
-            almuerzos
-        });
-        
+        res.json({ success: true, message: 'Ítem eliminado correctamente', almuerzos });
     } catch (error) {
-        console.error('Error eliminando ítem:', error);
         res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
@@ -403,31 +370,24 @@ app.put('/api/reservas', authMiddleware, async (req, res) => {
 app.post('/api/admin/login', async (req, res) => {
     try {
         const { username, password } = req.body;
-        
         if (!username || !password) {
             return res.status(400).json({ error: 'Usuario y contraseña requeridos' });
         }
-        
         const admin = await Admin.findOne({ username });
-        
         if (!admin) {
             return res.status(401).json({ error: 'Credenciales incorrectas' });
         }
-        
-        // COMPARACIÓN SIMPLE (sin bcrypt)
-        if (admin.password !== password) {
+        // Comparar usando bcrypt
+        const isValid = await admin.comparePassword(password);
+        if (!isValid) {
             return res.status(401).json({ error: 'Credenciales incorrectas' });
         }
-        
-        // Actualizar último login
         admin.lastLogin = new Date();
         await admin.save();
-        
-        // Generar token simple (sin JWT por ahora)
-        const token = 'dummy-token-' + Date.now();
-        
-        res.json({ 
-            success: true, 
+        // Generar JWT
+        const token = admin.generateAuthToken();
+        res.json({
+            success: true,
             token,
             admin: {
                 username: admin.username,
@@ -435,7 +395,6 @@ app.post('/api/admin/login', async (req, res) => {
                 lastLogin: admin.lastLogin
             }
         });
-        
     } catch (error) {
         console.error('Error en login:', error);
         res.status(500).json({ error: 'Error interno del servidor' });
@@ -445,12 +404,10 @@ app.post('/api/admin/login', async (req, res) => {
 app.get('/api/admin/verify', authMiddleware, async (req, res) => {
     try {
         const admin = await Admin.findById(req.user.id);
-        
         if (!admin) {
             return res.status(404).json({ error: 'Admin no encontrado' });
         }
-        
-        res.json({ 
+        res.json({
             success: true,
             admin: {
                 username: admin.username,
@@ -467,43 +424,27 @@ app.get('/api/admin/verify', authMiddleware, async (req, res) => {
 app.put('/api/admin/username', authMiddleware, async (req, res) => {
     try {
         const { currentPassword, newUsername } = req.body;
-        
         if (!currentPassword || !newUsername) {
             return res.status(400).json({ error: 'Datos incompletos' });
         }
-        
         const admin = await Admin.findById(req.user.id);
         if (!admin) {
             return res.status(404).json({ error: 'Admin no encontrado' });
         }
-        
         // Verificar contraseña actual
-        const isValidPassword = await bcrypt.compare(currentPassword, admin.password);
+        const isValidPassword = await admin.comparePassword(currentPassword);
         if (!isValidPassword) {
             return res.status(401).json({ error: 'Contraseña actual incorrecta' });
         }
-        
-        // Actualizar username
         admin.username = newUsername;
         await admin.save();
-        
         // Generar nuevo token
-        const newToken = jwt.sign(
-            { 
-                id: admin._id, 
-                username: admin.username, 
-                role: admin.role 
-            },
-            process.env.JWT_SECRET,
-            { expiresIn: '24h' }
-        );
-        
-        res.json({ 
-            success: true, 
+        const newToken = admin.generateAuthToken();
+        res.json({
+            success: true,
             token: newToken,
             message: 'Usuario actualizado correctamente'
         });
-        
     } catch (error) {
         console.error('Error cambiando username:', error);
         res.status(500).json({ error: 'Error interno del servidor' });
@@ -513,35 +454,27 @@ app.put('/api/admin/username', authMiddleware, async (req, res) => {
 app.put('/api/admin/password', authMiddleware, async (req, res) => {
     try {
         const { currentPassword, newPassword } = req.body;
-        
         if (!currentPassword || !newPassword) {
             return res.status(400).json({ error: 'Datos incompletos' });
         }
-        
         if (newPassword.length < 6) {
             return res.status(400).json({ error: 'La nueva contraseña debe tener al menos 6 caracteres' });
         }
-        
         const admin = await Admin.findById(req.user.id);
         if (!admin) {
             return res.status(404).json({ error: 'Admin no encontrado' });
         }
-        
         // Verificar contraseña actual
-        const isValidPassword = await bcrypt.compare(currentPassword, admin.password);
+        const isValidPassword = await admin.comparePassword(currentPassword);
         if (!isValidPassword) {
             return res.status(401).json({ error: 'Contraseña actual incorrecta' });
         }
-        
-        // Actualizar contraseña
         admin.password = newPassword;
         await admin.save();
-        
-        res.json({ 
-            success: true, 
+        res.json({
+            success: true,
             message: 'Contraseña actualizada correctamente'
         });
-        
     } catch (error) {
         console.error('Error cambiando password:', error);
         res.status(500).json({ error: 'Error interno del servidor' });
